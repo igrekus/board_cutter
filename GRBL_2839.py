@@ -1,5 +1,9 @@
+import platform
+
 import serial
 import time
+
+from find_device import find_mill_win
 
 msg = []
 x_center = 30410  # X cord center in um
@@ -76,23 +80,34 @@ def return_to_null():
 
 
 # connection procedure
-while True:
-    try:
-        ser = serial.Serial(timeout=2, port='/dev/tty.wchusbserial1420', baudrate=115200)
-        ser.close()
-        ser.open()
-        break
-    except FileNotFoundError:
-        print("Device is not connected")
-    except serial.serialutil.SerialException:
-        print("Cant connect to device!")
-        txt = input("Wait for input")
+ser = None
+if platform.system() == 'Darwin':
+    while True:
+        try:
+            ser=serial.Serial(timeout=2, port='/dev/tty.wchusbserial1420',baudrate=115200)
+            ser.close()
+            ser.open()
+            break
+        except FileNotFoundError:
+            print("Device is not connected")
+        except serial.serialutil.SerialException:
+            print("Cant connect to device!")
+            txt = input("Wait for input")
+elif platform.system() == 'Windows':
+    ser = find_mill_win()
+
+if not ser:
+    raise RuntimeError('No device found')
+
 
 txt = input("Enter smth:")
 time.sleep(0.5)
 readmsg(msg)
-print(msg[0])
-print(msg[1])
+try:
+    print(msg[0])
+    print(msg[1])
+except LookupError:
+    pass
 writemsg("M5")  # stop spindel if is on
 writemsg("$RST=#")  # reset G54-G59 cordinates
 writemsg("G17")  # choose XY plane
