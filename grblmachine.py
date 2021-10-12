@@ -49,7 +49,7 @@ class GrblMachine:
             return False
 
     def close(self):
-        if self._port.is_open:
+        if self._port is not None and self._port.is_open:
             self._port.close()
 
     def read(self):
