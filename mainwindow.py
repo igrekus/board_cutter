@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 
 from backgroundworker import BackgroundWorker, CancelToken
 from instrumentcontroller import InstrumentController
+from movewidget import MoveWidget
 
 
 class MainWindow(QMainWindow):
@@ -21,6 +22,11 @@ class MainWindow(QMainWindow):
         self._connectToken = CancelToken()
 
         self._controller = InstrumentController(parent=self)
+
+        # build control widgets
+        self._moveWidget = MoveWidget(parent=self, controller=self._controller)
+
+        self._ui.tabMain.addTab(self._moveWidget, 'Перемещение инструмента')
 
         self._modeBeforeConnect()
 
