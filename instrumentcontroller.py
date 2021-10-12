@@ -4,20 +4,15 @@ from grblmachine import GrblMachine
 
 
 class InstrumentController(QObject):
-    machineFound = pyqtSignal()
-
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
         self._machine = GrblMachine()
 
-    def findMachine(self):
-        if not self._machine.find():
-            return False
-        self.machineFound.emit()
-        return True
+    def findMachine(self, token, **kwargs):
+        return bool(self._machine.find())
 
-    def init(self):
+    def init(self, token, **kwargs):
         print('init machine...')
         return all([
             self._machine.stop_spindle(),
