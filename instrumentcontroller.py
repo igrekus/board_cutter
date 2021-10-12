@@ -13,6 +13,12 @@ class InstrumentController(QObject):
 
     def findMachine(self):
         if not self._machine.find():
-            raise RuntimeError('No target machine found')
+            return False
+        self.machineFound.emit()
+        return True
 
         self.machineFound.emit()
+
+    def closeConnections(self):
+        self._machine.close()
+
