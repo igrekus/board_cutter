@@ -30,7 +30,9 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
             return
 
-        self._controller.init()
+        if not self._controller.init():
+            QMessageBox.information(self, 'Внимание', 'Ошибка инициализации GRBL, подробности в логах.')
+            return
 
     @pyqtSlot()
     def on_machineFound(self):

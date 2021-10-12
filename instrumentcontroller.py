@@ -17,8 +17,17 @@ class InstrumentController(QObject):
         self.machineFound.emit()
         return True
 
-        self.machineFound.emit()
+    def init(self):
+        print('init machine...')
+        return all([
+            self._machine.stop_spindle(),
+            # self._machine.set_feed_rate(150),
+            self._machine.send_raw_command('$RST=#'),  # non-standard GCode command: reset G54-G59 coords
+            self._machine.select_xy_plane(),
+            self._machine.set_unit('mm'),
+            self._machine.set_distance_mode('incremental'),
+            self._machine.flush_input(),
+        ])
 
     def closeConnections(self):
         self._machine.close()
-
