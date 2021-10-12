@@ -39,21 +39,27 @@ class MainWindow(QMainWindow):
 
     def _on_connectFinished(self, result: bool):
         if not result:
-            QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
+            # TODO this crashes if called from another thread, fix somehow
+            print('error finding GRBL, check connection')
+            # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
+            self._modeBeforeConnect()
             return
 
         self._initMachine()
 
     def _initMachine(self):
-        self._connect_worker.startTask(
+        self._connect_worker.runTask(
             fn=self._controller.init,
             fn_finished=self._on_initFinished,
         )
 
     def _on_initFinished(self, result: bool):
         if not result:
-            QMessageBox.information(self, 'Внимание', 'Ошибка инициализации GRBL, подробности в логах.')
+            print('error init GRBL, see logs')
+            # QMessageBox.information(self, 'Внимание', 'Ошибка инициализации GRBL, подробности в логах.')
+            self._modeBeforeConnect()
             return
+
         self._modeReady()
 
     def _modeBeforeConnect(self):
