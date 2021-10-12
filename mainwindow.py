@@ -17,8 +17,8 @@ class MainWindow(QMainWindow):
         # create instance variables
         self._ui = uic.loadUi('mainwindow.ui', self)
 
-        self._connect_worker = BackgroundWorker(self)
-        self._connect_token = CancelToken()
+        self._connectWorker = BackgroundWorker(self)
+        self._connectToken = CancelToken()
 
         self._controller = InstrumentController(parent=self)
 
@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
         self._connect()
 
     def _connect(self):
-        self._connect_worker.runTask(
+        self._connectWorker.runTask(
             fn=self._controller.findMachine,
             fn_finished=self._on_connectFinished,
         )
@@ -48,7 +48,7 @@ class MainWindow(QMainWindow):
         self._initMachine()
 
     def _initMachine(self):
-        self._connect_worker.runTask(
+        self._connectWorker.runTask(
             fn=self._controller.init,
             fn_finished=self._on_initFinished,
         )
