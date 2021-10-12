@@ -36,7 +36,7 @@ class BackgroundWorker(QObject):
         super().__init__(parent=parent)
         self._threads = QThreadPool()
 
-    def startTask(self, fn=None, fn_started=None, fn_finished=None, fn_failed=None, token=None, **kwargs):
+    def runTask(self, fn=None, fn_started=None, fn_finished=None, fn_failed=None, token=None, **kwargs):
         self._threads.start(
             Task(
                 fn=fn,

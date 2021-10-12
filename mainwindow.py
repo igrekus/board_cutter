@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
         self._connect()
 
     def _connect(self):
-        self._connect_worker.startTask(
+        self._connect_worker.runTask(
             fn=self._controller.findMachine,
             fn_finished=self._on_connectFinished,
         )
