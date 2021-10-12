@@ -14,7 +14,7 @@ class GrblMachine:
         self._port: Optional[serial.Serial] = None
 
     def __str__(self):
-        return f'{self.__class__.__name__}@{self._port.port}'
+        return f'GRBL@{self._port.port}'
 
     @staticmethod
     def _available_ports_win():
