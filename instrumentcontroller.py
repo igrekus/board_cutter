@@ -9,10 +9,9 @@ class InstrumentController(QObject):
 
         self._machine = GrblMachine()
 
-        self._deltaUp = 10.0  # mm
-        self._deltaDown = 10.0
-        self._deltaLeft = 10.0
-        self._deltaRight = 10.0
+        self._deltaX = 10.0  # mm
+        self._deltaY = 10.0
+        self._deltaZ = 10.0
 
     def findMachine(self, token, **kwargs):
         return bool(self._machine.find())
@@ -33,17 +32,23 @@ class InstrumentController(QObject):
     def closeConnections(self):
         self._machine.close()
 
-    def moveUp(self, token, **kwargs):
-        return self._machine.move_up(self._deltaUp)
+    def moveXMinus(self, token, **kwargs):
+        return self._machine.move_x(-self.deltaX)
 
-    def moveDown(self, token, **kwargs):
-        return self._machine.move_down(self._deltaDown)
+    def moveXPlus(self, token, **kwargs):
+        return self._machine.move_x(self.deltaX)
 
-    def moveLeft(self, token, **kwargs):
-        return self._machine.move_left(self._deltaLeft)
+    def moveYMinus(self, token, **kwargs):
+        return self._machine.move_y(-self.deltaY)
 
-    def moveRight(self, token, **kwargs):
-        return self._machine.move_right(self._deltaRight)
+    def moveYPlus(self, token, **kwargs):
+        return self._machine.move_y(self.deltaY)
+
+    def moveZMinus(self, token, **kwargs):
+        return self._machine.move_z(-self.deltaZ)
+
+    def moveZPlus(self, token, **kwargs):
+        return self._machine.move_z(self.deltaZ)
 
     def askG(self, token, **kwargs):
         return self._machine.query_g()
@@ -55,33 +60,25 @@ class InstrumentController(QObject):
         return self._machine.query_question()
 
     @property
-    def deltaUp(self):
-        return self._deltaUp
+    def deltaX(self):
+        return self._deltaX
 
-    @deltaUp.setter
-    def deltaUp(self, value):
-        self._deltaUp = value / 1_000  # convert um -> mm
-
-    @property
-    def deltaDown(self):
-        return self._deltaDown
-
-    @deltaDown.setter
-    def deltaDown(self, value):
-        self._deltaDown = value / 1_000  # convert um -> mm
+    @deltaX.setter
+    def deltaX(self, value):
+        self._deltaX = value / 1_000  # convert um -> mm
 
     @property
-    def deltaLeft(self):
-        return self._deltaLeft
+    def deltaY(self):
+        return self._deltaY
 
-    @deltaLeft.setter
-    def deltaLeft(self, value):
-        self._deltaLeft = value / 1_000  # convert um -> mm
+    @deltaY.setter
+    def deltaY(self, value):
+        self._deltaY = value / 1_000  # convert um -> mm
 
     @property
-    def deltaRight(self):
-        return self._deltaRight
+    def deltaZ(self):
+        return self._deltaZ
 
-    @deltaRight.setter
-    def deltaRight(self, value):
-        self._deltaRight = value / 1_000  # convert um -> mm
+    @deltaZ.setter
+    def deltaZ(self, value):
+        self._deltaZ = value / 1_000  # convert um -> mm

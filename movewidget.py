@@ -41,27 +41,39 @@ class MoveWidget(QWidget):
         self.askFinished.connect(self.on_askFinished)
         self.moveFinished.connect(self.on_moveFinished)
 
-    def _moveUp(self):
+    def _moveXMinus(self):
         self._moveWorker.runTask(
-            fn=self._controller.moveUp,
+            fn=self._controller.moveXMinus,
             fn_finished=self._moveFinishedCallback,
         )
 
-    def _moveDown(self):
+    def _moveXPlus(self):
         self._moveWorker.runTask(
-            fn=self._controller.moveDown,
+            fn=self._controller.moveXPlus,
             fn_finished=self._moveFinishedCallback,
         )
 
-    def _moveLeft(self):
+    def _moveYMinus(self):
         self._moveWorker.runTask(
-            fn=self._controller.moveLeft,
+            fn=self._controller.moveYMinus,
             fn_finished=self._moveFinishedCallback,
         )
 
-    def _moveRight(self):
+    def _moveYPlus(self):
         self._moveWorker.runTask(
-            fn=self._controller.moveRight,
+            fn=self._controller.moveYPlus,
+            fn_finished=self._moveFinishedCallback,
+        )
+
+    def _moveZMinus(self):
+        self._moveWorker.runTask(
+            fn=self._controller.moveZMinus,
+            fn_finished=self._moveFinishedCallback,
+        )
+
+    def _moveZPlus(self):
+        self._moveWorker.runTask(
+            fn=self._controller.moveZPlus,
             fn_finished=self._moveFinishedCallback,
         )
 
@@ -108,20 +120,28 @@ class MoveWidget(QWidget):
         self._ui.peditStatus.setPlainText(f'{data.decode("ascii")}\n')
 
     @pyqtSlot()
-    def on_btnUp_clicked(self):
-        self._moveUp()
+    def on_btnXMinus_clicked(self):
+        self._moveXMinus()
 
     @pyqtSlot()
-    def on_btnDown_clicked(self):
-        self._moveDown()
+    def on_btnXPlus_clicked(self):
+        self._moveXPlus()
 
     @pyqtSlot()
-    def on_btnLeft_clicked(self):
-        self._moveLeft()
+    def on_btnYMinus_clicked(self):
+        self._moveYMinus()
 
     @pyqtSlot()
-    def on_btnRight_clicked(self):
-        self._moveRight()
+    def on_btnYPlus_clicked(self):
+        self._moveYPlus()
+
+    @pyqtSlot()
+    def on_btnZMinus_clicked(self):
+        self._moveZMinus()
+
+    @pyqtSlot()
+    def on_btnZPlus_clicked(self):
+        self._moveZPlus()
 
     @pyqtSlot()
     def on_btnAskG_clicked(self):
@@ -136,17 +156,13 @@ class MoveWidget(QWidget):
         self._askQuestion()
 
     @pyqtSlot(int)
-    def on_spinUp_valueChanged(self, value):
-        self._controller.deltaUp = value
+    def on_spinX_valueChanged(self, value):
+        self._controller.deltaX = value
 
     @pyqtSlot(int)
-    def on_spinDown_valueChanged(self, value):
-        self._controller.deltaDown = value
+    def on_spinY_valueChanged(self, value):
+        self._controller.deltaY = value
 
     @pyqtSlot(int)
-    def on_spinLeft_valueChanged(self, value):
-        self._controller.deltaLeft = value
-
-    @pyqtSlot(int)
-    def on_spinRight_valueChanged(self, value):
-        self._controller.deltaRight = value
+    def on_spinZ_valueChanged(self, value):
+        self._controller.deltaZ = value

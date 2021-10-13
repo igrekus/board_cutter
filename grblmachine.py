@@ -110,25 +110,20 @@ class GrblMachine:
             raise NotImplementedError(f'GRBL: {mode} not implemented')
         return (b'ok' in self.send(str(pg.GCodeIncrementalDistanceMode()))), ''
 
-    def move_up(self, delta):
-        print('move up...')
+    def move_x(self, delta):
+        print('move X...')
         # TODO hack because lib doesn't support feed rate in linear move commands by default
+        command = f'{pg.GCodeLinearMove(X=delta)} {pg.GCodeFeedRate(150)}'
+        return (b'ok' in self.send(command)), ''
+
+    def move_y(self, delta):
+        print('move Y...')
         command = f'{pg.GCodeLinearMove(Y=delta)} {pg.GCodeFeedRate(150)}'
         return (b'ok' in self.send(command)), ''
 
-    def move_down(self, delta):
-        print('move down...')
-        command = f'{pg.GCodeLinearMove(Y=-delta)} {pg.GCodeFeedRate(150)}'
-        return (b'ok' in self.send(command)), ''
-
-    def move_left(self, delta):
-        print('move left...')
-        command = f'{pg.GCodeLinearMove(X=-delta)} {pg.GCodeFeedRate(150)}'
-        return (b'ok' in self.send(command)), ''
-
-    def move_right(self, delta):
-        print('move right...')
-        command = f'{pg.GCodeLinearMove(Y=delta)} {pg.GCodeFeedRate(150)}'
+    def move_z(self, delta):
+        print('move Z...')
+        command = f'{pg.GCodeLinearMove(Z=delta)} {pg.GCodeFeedRate(150)}'
         return (b'ok' in self.send(command)), ''
 
     def query_g(self):
