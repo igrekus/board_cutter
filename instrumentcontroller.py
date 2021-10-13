@@ -53,13 +53,15 @@ class InstrumentController(QObject):
             self._machine.move_right(self._deltaRight)
         ])
 
+    def askG(self, token, **kwargs):
+        return self._machine.query_g()
+
     @property
     def deltaUp(self):
         return self._deltaUp
 
     @deltaUp.setter
     def deltaUp(self, value):
-        print(value)
         self._deltaUp = value / 1_000  # convert um -> mm
 
     @property
@@ -68,7 +70,6 @@ class InstrumentController(QObject):
 
     @deltaDown.setter
     def deltaDown(self, value):
-        print(value)
         self._deltaDown = value / 1_000  # convert um -> mm
 
     @property
@@ -77,7 +78,6 @@ class InstrumentController(QObject):
 
     @deltaLeft.setter
     def deltaLeft(self, value):
-        print(value)
         self._deltaLeft = value / 1_000  # convert um -> mm
 
     @property
@@ -86,5 +86,4 @@ class InstrumentController(QObject):
 
     @deltaRight.setter
     def deltaRight(self, value):
-        print(value)
         self._deltaRight = value / 1_000  # convert um -> mm

@@ -75,6 +75,14 @@ class GrblMachine:
         print(f'{self} send >>>: {res}')
         return res
 
+    def query(self, question: str):
+        print(f'{self} query <<<: {question}')
+        self.write(question)
+        time.sleep(0.1)
+        res = self.read()
+        print(f'{self} query >>>: {res}')
+        return res
+
     def stop_spindle(self) -> bool:
         print('stop spindle...')
         return b'ok' in self.send(str(pg.GCodeStopSpindle()))
@@ -122,3 +130,8 @@ class GrblMachine:
         print('move right...')
         command = f'{pg.GCodeLinearMove(Y=delta)} {pg.GCodeFeedRate(150)}'
         return b'ok' in self.send(command)
+
+    def query_g(self):
+        print('query #G...')
+        result = self.query('$G')
+        return (b'ok' in result), result
