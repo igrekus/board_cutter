@@ -132,6 +132,16 @@ class GrblMachine:
         return (b'ok' in self.send(command)), ''
 
     def query_g(self):
-        print('query #G...')
+        print('query $G...')
         result = self.query('$G')
+        return (b'ok' in result), result
+
+    def query_hash(self):
+        print('query $#...')
+        result = self.query('$#')
+        return (b'ok' in result), result
+
+    def query_question(self):
+        print('query $#...')
+        result = self.query('$#')
         return (b'ok' in result), result

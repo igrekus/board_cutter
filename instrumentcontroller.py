@@ -48,6 +48,12 @@ class InstrumentController(QObject):
     def askG(self, token, **kwargs):
         return self._machine.query_g()
 
+    def askHash(self, token, **kwargs):
+        return self._machine.query_hash()
+
+    def askQuestion(self, token, **kwargs):
+        return self._machine.query_question()
+
     @property
     def deltaUp(self):
         return self._deltaUp
