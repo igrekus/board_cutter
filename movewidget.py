@@ -1,14 +1,25 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
 
 from backgroundworker import BackgroundWorker, CancelToken
 from instrumentcontroller import InstrumentController
 
 
+class TaskResult:
+    def __init__(self, ok, data):
+        self.ok = ok
+        self.data = data
+
+    @property
+    def values(self):
+        return self.ok, self.data
+
+
 class MoveWidget(QWidget):
 
-    askFinished = pyqtSignal(bytes)
+    askFinished = pyqtSignal(TaskResult)
+    moveFinished = pyqtSignal(TaskResult)
 
     def __init__(self, parent=None, controller: InstrumentController=None):
         super().__init__(parent)
@@ -28,6 +39,7 @@ class MoveWidget(QWidget):
 
     def _connectSignals(self):
         self.askFinished.connect(self.on_askFinished)
+        self.moveFinished.connect(self.on_moveFinished)
 
     def _moveUp(self):
         self._moveWorker.runTask(
@@ -53,12 +65,8 @@ class MoveWidget(QWidget):
             fn_finished=self._moveFinishedCallback,
         )
 
-    def _moveFinishedCallback(self, result: bool):
-        if not result:
-            print('error during move command, check logs')
-            # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
-            return
-        print('finished moving')
+    def _moveFinishedCallback(self, result: tuple):
+        self.moveFinished.emit(TaskResult(*result))
 
     def _askG(self):
         self._moveWorker.runTask(
@@ -78,18 +86,26 @@ class MoveWidget(QWidget):
             fn_finished=self.askFinishedCallback,
         )
 
-    def askFinishedCallback(self, result: bool):
-        ok, res = result
+    def askFinishedCallback(self, result: tuple):
+        self.askFinished.emit(TaskResult(*result))
+
+    @pyqtSlot(TaskResult)
+    def on_moveFinished(self, result):
+        ok, _ = result.values
         if not ok:
-            print('error during ask command, check logs')
+            print('error during move command, check logs')
             # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
             return
+        print('move finished')
 
-        self.askFinished.emit(res)
-
-    @pyqtSlot(bytes)
-    def on_askFinished(self, value):
-        self._ui.peditStatus.setPlainText(f'{value.decode("ascii")}\n')
+    @pyqtSlot(TaskResult)
+    def on_askFinished(self, result: TaskResult):
+        ok, data = result.values
+        if not ok:
+            print('error during ask command, check logs')
+            # QMessageBox.information(self, 'Внимание', 'Ошибка выполнения запроса к GRBL, подробности в логах.')
+            return
+        self._ui.peditStatus.setPlainText(f'{data.decode("ascii")}\n')
 
     @pyqtSlot()
     def on_btnUp_clicked(self):

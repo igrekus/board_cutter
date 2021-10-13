@@ -1,6 +1,6 @@
 import time
 
-from typing import Optional
+from typing import Optional, Tuple
 
 import pygcode as pg
 import serial
@@ -83,53 +83,53 @@ class GrblMachine:
         print(f'{self} query >>>: {res}')
         return res
 
-    def stop_spindle(self) -> bool:
+    def stop_spindle(self) -> Tuple[bool, str]:
         print('stop spindle...')
-        return b'ok' in self.send(str(pg.GCodeStopSpindle()))
+        return (b'ok' in self.send(str(pg.GCodeStopSpindle()))), ''
 
     def set_feed_rate(self, value):
         print('set feed rate...')
-        return b'ok' in self.send(str(pg.GCodeFeedRate(value)))
+        return (b'ok' in self.send(str(pg.GCodeFeedRate(value)))), ''
 
     def send_raw_command(self, command):
         print('restore defaults...')
-        return b'ok' in self.send(command)
+        return (b'ok' in self.send(command)), ''
 
     def select_xy_plane(self):
         print('select XY plane...')
-        return b'ok' in self.send(str(pg.GCodeSelectXYPlane()))
+        return (b'ok' in self.send(str(pg.GCodeSelectXYPlane()))), ''
 
     def set_unit(self, unit='mm'):
         print(f'set unit to {unit}...')
         gcode = pg.GCodeUseMillimeters if unit == 'mm' else pg.GCodeUseInches
-        return b'ok' in self.send(str(gcode()))
+        return (b'ok' in self.send(str(gcode()))), ''
 
     def set_distance_mode(self, mode='incremental'):
         print(f'set distance mode {mode}')
         if mode != 'incremental':
             raise NotImplementedError(f'GRBL: {mode} not implemented')
-        return b'ok' in self.send(str(pg.GCodeIncrementalDistanceMode()))
+        return (b'ok' in self.send(str(pg.GCodeIncrementalDistanceMode()))), ''
 
     def move_up(self, delta):
         print('move up...')
         # TODO hack because lib doesn't support feed rate in linear move commands by default
         command = f'{pg.GCodeLinearMove(Y=delta)} {pg.GCodeFeedRate(150)}'
-        return b'ok' in self.send(command)
+        return (b'ok' in self.send(command)), ''
 
     def move_down(self, delta):
         print('move down...')
         command = f'{pg.GCodeLinearMove(Y=-delta)} {pg.GCodeFeedRate(150)}'
-        return b'ok' in self.send(command)
+        return (b'ok' in self.send(command)), ''
 
     def move_left(self, delta):
         print('move left...')
         command = f'{pg.GCodeLinearMove(X=-delta)} {pg.GCodeFeedRate(150)}'
-        return b'ok' in self.send(command)
+        return (b'ok' in self.send(command)), ''
 
     def move_right(self, delta):
         print('move right...')
         command = f'{pg.GCodeLinearMove(Y=delta)} {pg.GCodeFeedRate(150)}'
-        return b'ok' in self.send(command)
+        return (b'ok' in self.send(command)), ''
 
     def query_g(self):
         print('query #G...')

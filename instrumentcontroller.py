@@ -34,24 +34,16 @@ class InstrumentController(QObject):
         self._machine.close()
 
     def moveUp(self, token, **kwargs):
-        return all([
-            self._machine.move_up(self._deltaUp)
-        ])
+        return self._machine.move_up(self._deltaUp)
 
     def moveDown(self, token, **kwargs):
-        return all([
-            self._machine.move_down(self._deltaDown)
-        ])
+        return self._machine.move_down(self._deltaDown)
 
     def moveLeft(self, token, **kwargs):
-        return all([
-            self._machine.move_left(self._deltaLeft)
-        ])
+        return self._machine.move_left(self._deltaLeft)
 
     def moveRight(self, token, **kwargs):
-        return all([
-            self._machine.move_right(self._deltaRight)
-        ])
+        return self._machine.move_right(self._deltaRight)
 
     def askG(self, token, **kwargs):
         return self._machine.query_g()
