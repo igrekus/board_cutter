@@ -13,8 +13,14 @@ class InstrumentController(QObject):
         self._deltaY = 10.0
         self._deltaZ = 10.0
 
-    def findMachine(self, token, **kwargs):
+    def findDevices(self, token, **kwargs):
+        return self._findMachive() and self._findFreqCounter()
+
+    def _findMachive(self):
         return bool(self._machine.find())
+
+    def _findFreqCounter(self):
+        return True
 
     def init(self, token, **kwargs):
         print('init machine...')
