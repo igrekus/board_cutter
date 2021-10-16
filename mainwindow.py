@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from backgroundworker import BackgroundWorker, CancelToken
 from instrumentcontroller import InstrumentController
 from movewidget import MoveWidget
+from probewidget import ProbeWidget
 
 
 class MainWindow(QMainWindow):
@@ -25,8 +26,11 @@ class MainWindow(QMainWindow):
 
         # build control widgets
         self._moveWidget = MoveWidget(parent=self, controller=self._controller)
+        self._probeWidget = ProbeWidget(parent=self, controller=self._controller)
 
         self._ui.tabMain.addTab(self._moveWidget, 'Перемещение инструмента')
+        self._ui.tabMain.addTab(self._probeWidget, 'Калибровка инструмента')
+        self._ui.tabMain.setCurrentIndex(0)
 
         self._modeBeforeConnect()
 
