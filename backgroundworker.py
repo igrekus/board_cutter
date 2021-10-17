@@ -44,6 +44,6 @@ class BackgroundWorker(QObject):
                 fn_finished=fn_finished,
                 fn_failed=fn_failed,
                 cancel_token=token,
-                kwargs=kwargs,
+                **kwargs,
             )
         )
