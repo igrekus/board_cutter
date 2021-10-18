@@ -47,3 +47,13 @@ class BackgroundWorker(QObject):
                 **kwargs,
             )
         )
+
+
+class TaskResult:
+    def __init__(self, ok, data):
+        self.ok = ok
+        self.data = data
+
+    @property
+    def values(self):
+        return self.ok, self.data
