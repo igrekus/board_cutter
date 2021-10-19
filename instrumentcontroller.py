@@ -65,6 +65,12 @@ class InstrumentController(QObject):
     def askQuestion(self, token, **kwargs):
         return self._machine.query_question()
 
+    def sendRawCommand(self, token, **kwargs):
+        command = kwargs.pop('command', '')
+        if command:
+            return self._machine.send_raw_command(command)
+        return False, 'no command supplied, abort'
+
     @property
     def deltaX(self):
         return self._deltaX

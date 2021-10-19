@@ -92,8 +92,9 @@ class GrblMachine:
         return (b'ok' in self.send(str(pg.GCodeFeedRate(value)))), ''
 
     def send_raw_command(self, command):
-        print('restore defaults...')
-        return (b'ok' in self.send(command)), ''
+        print('send raw command defaults...')
+        res = self.send(command)
+        return (b'ok' in res), res
 
     def select_xy_plane(self):
         print('select XY plane...')

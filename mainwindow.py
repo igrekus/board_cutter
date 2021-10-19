@@ -6,6 +6,7 @@ from backgroundworker import BackgroundWorker, CancelToken
 from instrumentcontroller import InstrumentController
 from movewidget import MoveWidget
 from probewidget import ProbeWidget
+from rawwidget import RawWidget
 
 
 class MainWindow(QMainWindow):
@@ -25,11 +26,13 @@ class MainWindow(QMainWindow):
         self._controller = InstrumentController(parent=self)
 
         # build control widgets
+        self._rawWidget = RawWidget(parent=self, controller=self._controller)
         self._moveWidget = MoveWidget(parent=self, controller=self._controller)
         self._probeWidget = ProbeWidget(parent=self, controller=self._controller)
 
-        self._ui.tabMain.addTab(self._moveWidget, 'Перемещение инструмента')
-        self._ui.tabMain.addTab(self._probeWidget, 'Калибровка инструмента')
+        self._ui.tabMain.addTab(self._rawWidget, 'Прямой доступ')
+        self._ui.tabMain.addTab(self._moveWidget, 'Перемещение')
+        self._ui.tabMain.addTab(self._probeWidget, 'Калибровка')
         self._ui.tabMain.setCurrentIndex(0)
 
         self._modeBeforeConnect()
