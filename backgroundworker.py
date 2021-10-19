@@ -44,6 +44,16 @@ class BackgroundWorker(QObject):
                 fn_finished=fn_finished,
                 fn_failed=fn_failed,
                 cancel_token=token,
-                kwargs=kwargs,
+                **kwargs,
             )
         )
+
+
+class TaskResult:
+    def __init__(self, ok, data):
+        self.ok = ok
+        self.data = data
+
+    @property
+    def values(self):
+        return self.ok, self.data

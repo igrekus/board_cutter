@@ -27,7 +27,7 @@ class InstrumentController(QObject):
         return all([
             # self._machine.stop_spindle(),
             # # self._machine.set_feed_rate(150),
-            # self._machine.send_raw_command('$RST=#'),  # non-standard GCode command: reset G54-G59 coords
+            # self._machine.send_raw_command('$RST=#'),  # non-standard GCode command: reset G54-G59 coords # TODO wrap raw command into a helper method
             # self._machine.select_xy_plane(),
             # self._machine.set_unit('mm'),
             # self._machine.set_distance_mode('incremental'),
@@ -64,6 +64,12 @@ class InstrumentController(QObject):
 
     def askQuestion(self, token, **kwargs):
         return self._machine.query_question()
+
+    def sendRawCommand(self, token, **kwargs):
+        command = kwargs.pop('command', '')
+        if command:
+            return self._machine.send_raw_command(command)
+        return False, 'no command supplied, abort'
 
     @property
     def deltaX(self):
