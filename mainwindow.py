@@ -46,6 +46,9 @@ class MainWindow(QMainWindow):
         self._moveWidget.commStarted.connect(self.on_commStarted)
         self._moveWidget.commFinished.connect(self.on_commFinished)
 
+        self._probeWidget.commStarted.connect(self.on_commStarted)
+        self._probeWidget.commFinished.connect(self.on_commFinished)
+
     @pyqtSlot()
     def on_btnConnect_clicked(self):
         print('find machine...')
