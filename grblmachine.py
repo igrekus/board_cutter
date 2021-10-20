@@ -73,7 +73,7 @@ class GrblMachine:
         time.sleep(0.1)
         res = self.read()
         print(f'{self} send >>>: {res}')
-        return res
+        return res.decode('ascii').strip()
 
     def query(self, question: str):
         print(f'{self} query <<<: {question}')
@@ -81,63 +81,63 @@ class GrblMachine:
         time.sleep(0.1)
         res = self.read()
         print(f'{self} query >>>: {res}')
-        return res
+        return res.decode('ascii').strip()
 
     def stop_spindle(self) -> Tuple[bool, str]:
         print('stop spindle...')
-        return (b'ok' in self.send(str(pg.GCodeStopSpindle()))), ''
+        return ('ok' in self.send(str(pg.GCodeStopSpindle()))), ''
 
     def set_feed_rate(self, value):
         print('set feed rate...')
-        return (b'ok' in self.send(str(pg.GCodeFeedRate(value)))), ''
+        return ('ok' in self.send(str(pg.GCodeFeedRate(value)))), ''
 
     def send_raw_command(self, command):
         print('send raw command defaults...')
         res = self.send(command)
-        return (b'ok' in res), res
+        return ('ok' in res), res
 
     def select_xy_plane(self):
         print('select XY plane...')
-        return (b'ok' in self.send(str(pg.GCodeSelectXYPlane()))), ''
+        return ('ok' in self.send(str(pg.GCodeSelectXYPlane()))), ''
 
     def set_unit(self, unit='mm'):
         print(f'set unit to {unit}...')
         gcode = pg.GCodeUseMillimeters if unit == 'mm' else pg.GCodeUseInches
-        return (b'ok' in self.send(str(gcode()))), ''
+        return ('ok' in self.send(str(gcode()))), ''
 
     def set_distance_mode(self, mode='incremental'):
         print(f'set distance mode {mode}')
         if mode != 'incremental':
             raise NotImplementedError(f'GRBL: {mode} not implemented')
-        return (b'ok' in self.send(str(pg.GCodeIncrementalDistanceMode()))), ''
+        return ('ok' in self.send(str(pg.GCodeIncrementalDistanceMode()))), ''
 
     def move_x(self, delta):
         print('move X...')
         # TODO hack because lib doesn't support feed rate in linear move commands by default
         command = f'{pg.GCodeLinearMove(X=delta)} {pg.GCodeFeedRate(150)}'
-        return (b'ok' in self.send(command)), ''
+        return ('ok' in self.send(command)), ''
 
     def move_y(self, delta):
         print('move Y...')
         command = f'{pg.GCodeLinearMove(Y=delta)} {pg.GCodeFeedRate(150)}'
-        return (b'ok' in self.send(command)), ''
+        return ('ok' in self.send(command)), ''
 
     def move_z(self, delta):
         print('move Z...')
         command = f'{pg.GCodeLinearMove(Z=delta)} {pg.GCodeFeedRate(150)}'
-        return (b'ok' in self.send(command)), ''
+        return ('ok' in self.send(command)), ''
 
     def query_g(self):
         print('query $G...')
         result = self.query('$G')
-        return (b'ok' in result), result
+        return ('ok' in result), result
 
     def query_hash(self):
         print('query $#...')
         result = self.query('$#')
-        return (b'ok' in result), result
+        return ('ok' in result), result
 
     def query_question(self):
         print('query $#...')
         result = self.query('$#')
-        return (b'ok' in result), result
+        return ('ok' in result), result
