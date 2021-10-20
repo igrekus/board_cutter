@@ -40,8 +40,11 @@ class MainWindow(QMainWindow):
         self._connectSignals()
 
     def _connectSignals(self):
-        self._rawWidget.commStarted.connect(self.on_rawWidget_commStarted)
-        self._rawWidget.commFinished.connect(self.on_rawWidget_commFinished)
+        self._rawWidget.commStarted.connect(self.on_commStarted)
+        self._rawWidget.commFinished.connect(self.on_commFinished)
+
+        self._moveWidget.commStarted.connect(self.on_commStarted)
+        self._moveWidget.commFinished.connect(self.on_commFinished)
 
     @pyqtSlot()
     def on_btnConnect_clicked(self):
@@ -82,11 +85,11 @@ class MainWindow(QMainWindow):
         self._modeReady()
 
     @pyqtSlot()
-    def on_rawWidget_commStarted(self):
+    def on_commStarted(self):
         self._modeDuringComm()
 
     @pyqtSlot()
-    def on_rawWidget_commFinished(self):
+    def on_commFinished(self):
         self._modeReady()
 
     def _modeBeforeConnect(self):

@@ -2,22 +2,14 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
 
-from backgroundworker import BackgroundWorker, CancelToken
+from backgroundworker import BackgroundWorker, CancelToken, TaskResult
 from instrumentcontroller import InstrumentController
-
-
-class TaskResult:
-    def __init__(self, ok, data):
-        self.ok = ok
-        self.data = data
-
-    @property
-    def values(self):
-        return self.ok, self.data
 
 
 class MoveWidget(QWidget):
 
+    commStarted = pyqtSignal()
+    commFinished = pyqtSignal()
     moveFinished = pyqtSignal(TaskResult)
 
     def __init__(self, parent=None, controller: InstrumentController=None):
@@ -29,8 +21,8 @@ class MoveWidget(QWidget):
         # create instance variables
         self._ui = uic.loadUi('movewidget.ui', self)
 
-        self._moveWorker = BackgroundWorker(self)
-        self._moveToken = CancelToken()
+        self._worker = BackgroundWorker(self)
+        self._token = CancelToken()
 
         self._controller = controller
 
@@ -39,40 +31,45 @@ class MoveWidget(QWidget):
     def _connectSignals(self):
         self.moveFinished.connect(self.on_moveFinished)
 
+    # worker dispatch
+    def _startWorker(self, fn, cb, **kwargs):
+        self._worker.runTask(fn=fn, fn_finished=cb, **kwargs)
+        self.commStarted.emit()
+
     def _moveXMinus(self):
-        self._moveWorker.runTask(
+        self._startWorker(
             fn=self._controller.moveXMinus,
-            fn_finished=self._moveFinishedCallback,
+            cb=self._moveFinishedCallback,
         )
 
     def _moveXPlus(self):
-        self._moveWorker.runTask(
+        self._startWorker(
             fn=self._controller.moveXPlus,
-            fn_finished=self._moveFinishedCallback,
+            cb=self._moveFinishedCallback,
         )
 
     def _moveYMinus(self):
-        self._moveWorker.runTask(
+        self._startWorker(
             fn=self._controller.moveYMinus,
-            fn_finished=self._moveFinishedCallback,
+            cb=self._moveFinishedCallback,
         )
 
     def _moveYPlus(self):
-        self._moveWorker.runTask(
+        self._startWorker(
             fn=self._controller.moveYPlus,
-            fn_finished=self._moveFinishedCallback,
+            cb=self._moveFinishedCallback,
         )
 
     def _moveZMinus(self):
-        self._moveWorker.runTask(
+        self._startWorker(
             fn=self._controller.moveZMinus,
-            fn_finished=self._moveFinishedCallback,
+            cb=self._moveFinishedCallback,
         )
 
     def _moveZPlus(self):
-        self._moveWorker.runTask(
+        self._startWorker(
             fn=self._controller.moveZPlus,
-            fn_finished=self._moveFinishedCallback,
+            cb=self._moveFinishedCallback,
         )
 
     def _moveFinishedCallback(self, result: tuple):
@@ -84,8 +81,10 @@ class MoveWidget(QWidget):
         if not ok:
             print('error during move command, check logs')
             # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
+            self.commFinished.emit()
             return
         print('move finished')
+        self.commFinished.emit()
 
     @pyqtSlot()
     def on_btnXMinus_clicked(self):
