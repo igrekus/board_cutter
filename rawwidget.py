@@ -8,6 +8,8 @@ from instrumentcontroller import InstrumentController
 
 class RawWidget(QWidget):
 
+    commStarted = pyqtSignal()
+    commFinished = pyqtSignal()
     askFinished = pyqtSignal(TaskResult)
     commandFinished = pyqtSignal(TaskResult)
 
@@ -31,33 +33,39 @@ class RawWidget(QWidget):
         self.askFinished.connect(self.on_askFinished)
         self.commandFinished.connect(self.on_commandFinished)
 
+    # worker dispatch
+    def _startWorker(self, fn, cb, **kwargs):
+        self._worker.runTask(fn=fn, fn_finished=cb, **kwargs)
+        self.commStarted.emit()
+
     def _sendCommand(self):
-        self._worker.runTask(
+        self._startWorker(
             fn=self._controller.sendRawCommand,
-            fn_finished=self._commandFinishedCallback,
+            cb=self._commandFinishedCallback,
             command=self._ui.editCommand.text()
         )
 
-    def _commandFinishedCallback(self, result: tuple):
-        self.commandFinished.emit(TaskResult(*result))
-
     def _askG(self):
-        self._worker.runTask(
+        self._startWorker(
             fn=self._controller.askG,
-            fn_finished=self.askFinishedCallback,
+            cb=self.askFinishedCallback,
         )
 
     def _askHash(self):
-        self._worker.runTask(
+        self._startWorker(
             fn=self._controller.askHash,
-            fn_finished=self.askFinishedCallback,
+            cb=self.askFinishedCallback,
         )
 
     def _askQuestion(self):
-        self._worker.runTask(
+        self._startWorker(
             fn=self._controller.askQuestion,
-            fn_finished=self.askFinishedCallback,
+            cb=self.askFinishedCallback,
         )
+
+    # callbacks
+    def _commandFinishedCallback(self, result: tuple):
+        self.commandFinished.emit(TaskResult(*result))
 
     def askFinishedCallback(self, result: tuple):
         self.askFinished.emit(TaskResult(*result))
@@ -70,6 +78,7 @@ class RawWidget(QWidget):
             # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
             return
         self._ui.peditStatus.setPlainText(f'{msg.decode("ascii")}\n')
+        self.commFinished.emit()
 
     @pyqtSlot(TaskResult)
     def on_askFinished(self, result: TaskResult):
@@ -79,6 +88,7 @@ class RawWidget(QWidget):
             # QMessageBox.information(self, 'Внимание', 'Ошибка выполнения запроса к GRBL, подробности в логах.')
             return
         self._ui.peditStatus.setPlainText(f'{data.decode("ascii")}\n')
+        self.commFinished.emit()
 
     @pyqtSlot()
     def on_btnCommand_clicked(self):

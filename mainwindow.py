@@ -37,6 +37,12 @@ class MainWindow(QMainWindow):
 
         self._modeBeforeConnect()
 
+        self._connectSignals()
+
+    def _connectSignals(self):
+        self._rawWidget.commStarted.connect(self.on_rawWidget_commStarted)
+        self._rawWidget.commFinished.connect(self.on_rawWidget_commFinished)
+
     @pyqtSlot()
     def on_btnConnect_clicked(self):
         print('find machine...')
@@ -75,6 +81,14 @@ class MainWindow(QMainWindow):
 
         self._modeReady()
 
+    @pyqtSlot()
+    def on_rawWidget_commStarted(self):
+        self._modeDuringComm()
+
+    @pyqtSlot()
+    def on_rawWidget_commFinished(self):
+        self._modeReady()
+
     def _modeBeforeConnect(self):
         self._ui.tabMain.setEnabled(False)
         self._ui.btnConnect.setEnabled(True)
@@ -86,6 +100,10 @@ class MainWindow(QMainWindow):
         self._ui.btnConnect.setEnabled(False)
 
         self._ui.editAddress.setText('')
+
+    def _modeDuringComm(self):
+        self._ui.tabMain.setEnabled(False)
+        self._ui.btnConnect.setEnabled(False)
 
     def _modeReady(self):
         self._ui.tabMain.setEnabled(True)
