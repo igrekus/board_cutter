@@ -28,7 +28,7 @@ class ProbeWidget(QWidget):
         self.setAttribute(Qt.WA_DeleteOnClose)
 
         # create instance variables
-        self._ui = uic.loadUi('movewidget.ui', self)
+        self._ui = uic.loadUi('probewidget.ui', self)
 
         self._moveWorker = BackgroundWorker(self)
         self._moveToken = CancelToken()
