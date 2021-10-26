@@ -101,6 +101,14 @@ class InstrumentController(QObject):
             self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
 
     def probeGoToNull(self, token, **kwargs):
+
+        def wait_helper():
+            self.state = 'Run'
+            while 'Run' in self.state:
+                self._queryState()
+                report_fn({})
+                time.sleep(0.5)
+
         null_x = round(self._null_x / 1_000, 3)
         null_y = round(self._null_y / 1_000, 3)
         null_z = round((4000 - self.probe_z) / 1_000)
@@ -111,24 +119,15 @@ class InstrumentController(QObject):
 
         res_move_x = self._machine.move_x(-null_x)
         self.state = 'Run'
-        while 'Run' in self.state:  # TODO move to helper
-            self._queryState()
-            report_fn({})
-            time.sleep(0.5)
+        wait_helper()
 
         res_move_y = self._machine.move_y(-null_y)
         self.state = 'Run'
-        while 'Run' in self.state:
-            self._queryState()
-            report_fn({})
-            time.sleep(0.5)
+        wait_helper()
 
         res_move_z = self._machine.move_z(null_z)
         self.state = 'Run'
-        while 'Run' in self.state:
-            self._queryState()
-            report_fn({})
-            time.sleep(0.5)
+        wait_helper()
 
         return \
             all(r for r, _ in (res_move_x, res_move_y, res_move_z)), ' '.join(m for _, m in (res_move_x, res_move_y, res_move_z))
