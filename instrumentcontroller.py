@@ -21,6 +21,8 @@ class InstrumentController(QObject):
         self.probe_y = 0.0
         self.probe_z = 0.0
 
+        self.state = 'Idle'
+
         self._null_x = 0.0
         self._null_y = 0.0
 
@@ -100,32 +102,38 @@ class InstrumentController(QObject):
         self._machine.flush_input()
 
         res_move_x = self._machine.move_x(-null_x)
-        response = 'Run'  # TODO move to helper
-        while 'Run' in response:
+        self.state = 'Run'
+        while 'Run' in self.state:  # TODO move to helper
             self._machine.flush_input()
             ok, response = self._machine.query_question()
             if ok:
-                self.probe_x, self.probe_y, self.probe_z = map(float, response.split('|')[1][5:].split(','))
+                state, coords, *rest = response.split('|')
+                self.state = state.lstrip('<')
+                self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
                 report_fn({})
             time.sleep(0.5)
 
         res_move_y = self._machine.move_y(-null_y)
-        response = 'Run'
-        while 'Run' in response:
+        self.state = 'Run'
+        while 'Run' in self.state:
             self._machine.flush_input()
             ok, response = self._machine.query_question()
             if ok:
-                self.probe_x, self.probe_y, self.probe_z = map(float, response.split('|')[1][5:].split(','))
+                state, coords, *rest = response.split('|')
+                self.state = state.lstrip('<')
+                self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
                 report_fn({})
             time.sleep(0.5)
 
         res_move_z = self._machine.move_z(null_z)
-        response = 'Run'
-        while 'Run' in response:
+        self.state = 'Run'
+        while 'Run' in self.state:
             self._machine.flush_input()
             ok, response = self._machine.query_question()
             if ok:
-                self.probe_x, self.probe_y, self.probe_z = map(float, response.split('|')[1][5:].split(','))
+                state, coords, *rest = response.split('|')
+                self.state = state.lstrip('<')
+                self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
                 report_fn({})
             time.sleep(0.5)
 
@@ -133,10 +141,30 @@ class InstrumentController(QObject):
             all(r for r, _ in (res_move_x, res_move_y, res_move_z)), ' '.join(m for _, m in (res_move_x, res_move_y, res_move_z))
 
     def probeCalibrateZ(self, token, **kwargs):
-
         report_fn = kwargs.pop('fn_progress')
 
         self._machine.flush_input()
+
+        #first step: z probing
+        if stateresponde() == "IDLE" and step1:
+            ser.flushInput()
+            writemsg("G10 L20 P1 X0Y0Z0") #set the null coordinates to G54
+            #print("Set the null in G54")
+            ser.flushInput()
+            writemsg("G54") #run in new cordinates
+            ser.flushInput()
+            writemsg("G38.2 Z-10 F10") #start probing
+            time.sleep(0.5)
+            while stateresponde() == "RUN":
+                #print("Running")
+                time.sleep(0.5)
+            #print("State is:" + stateresponde())
+            step1 = False
+            probe_z = Z_status("G54")-Z_status("PRB") # z in um
+            #print(str(probe_z))
+            print("Z probe done")
+            writemsg("G1 X0Y0Z0 F150")
+            ser.flushInput()
 
         return self._machine.query_g()
 
@@ -166,7 +194,10 @@ class InstrumentController(QObject):
 
     @property
     def probeState(self):
-        return dedent(f'''        Координаты:
+        return dedent(f'''        Состояние:
+        PRB: {self.state}
+        
+        Координаты:
         X={self.probe_x}
         Y={self.probe_y}
         Z={self.probe_z}
