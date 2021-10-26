@@ -138,6 +138,6 @@ class GrblMachine:
         return ('ok' in result), result
 
     def query_question(self):
-        print('query $#...')
-        result = self.query('$#')
+        print('query ?...')
+        result = self.query('?')
         return ('ok' in result), result
