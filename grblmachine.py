@@ -115,6 +115,8 @@ class GrblMachine:
             raise NotImplementedError(f'GRBL: {mode} not implemented')
         return ('ok' in self.send(str(pg.GCodeIncrementalDistanceMode()))), ''
 
+    # TODO add generic move method with coord params
+    # TODO add feed (F) parameter
     def move_x(self, delta):
         print('move X...')
         # TODO hack because lib doesn't support feed rate in linear move commands by default
