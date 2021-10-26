@@ -10,8 +10,11 @@ class ProbeWidget(QWidget):
 
     commStarted = pyqtSignal()
     commFinished = pyqtSignal()
+
     gotToNullFinished = pyqtSignal(TaskResult)
     askCoordFinished = pyqtSignal(TaskResult)
+    calibrateFinished = pyqtSignal(TaskResult)
+
     reportCoord = pyqtSignal(dict)
 
     def __init__(self, parent=None, controller: InstrumentController=None):
@@ -30,9 +33,16 @@ class ProbeWidget(QWidget):
 
         self._connectSignals()
 
+        self._init()
+
+    def _init(self):
+        # self._askCoord()
+        self._ui.peditStatus.setPlainText(self._controller.probeState)
+
     def _connectSignals(self):
         self.gotToNullFinished.connect(self.on_goToNullFinished)
         self.askCoordFinished.connect(self.on_askCoordFinished)
+        self.calibrateFinished.connect(self.on_calibrateFinished)
         self.reportCoord.connect(self.on_reportCoord)
 
     # worker dispatch
@@ -53,11 +63,21 @@ class ProbeWidget(QWidget):
             cb=self._askCoordFinishedCallback,
         )
 
+    def _calibrateZ(self):
+        self._startWorker(
+            fn=self._controller.probeCalibrateZ,
+            cb=self._probeCalibrateFinishedCallback,
+            prg=self._reportCoord,
+        )
+
     def _goToNullFinishedCallback(self, result: tuple):
         self.gotToNullFinished.emit(TaskResult(*result))
 
     def _askCoordFinishedCallback(self, result: tuple):
         self.askCoordFinished.emit(TaskResult(*result))
+
+    def _probeCalibrateFinishedCallback(self, result: tuple):
+        self.calibrateFinished.emit(TaskResult(*result))
 
     def _reportCoord(self, data):
         self.reportCoord.emit(data)
@@ -72,7 +92,6 @@ class ProbeWidget(QWidget):
             return
         print('move finished')
         self.commFinished.emit()
-        self._askCoord()
 
     @pyqtSlot(TaskResult)
     def on_askCoordFinished(self, result):
@@ -82,13 +101,28 @@ class ProbeWidget(QWidget):
             # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
             self.commFinished.emit()
             return
+        print(_)
+        self.commFinished.emit()
+
+    @pyqtSlot(TaskResult)
+    def on_calibrateFinished(self, result):
+        ok, _ = result.values
+        if not ok:
+            print('error during calibrations, check logs')
+            # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
+            self.commFinished.emit()
+            return
         self.commFinished.emit()
 
     @pyqtSlot(dict)
     def on_reportCoord(self, data):
-        self._ui.peditStatus.setPlainText(data['coords'])
+        self._ui.peditStatus.setPlainText(self._controller.probeState)
 
     @pyqtSlot()
     def on_btnGoToNull_clicked(self):
         self._goToNull()
+
+    @pyqtSlot()
+    def on_btnCalibrateZ_clicked(self):
+        self._calibrateZ()
 

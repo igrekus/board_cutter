@@ -1,5 +1,7 @@
 import time
 
+from textwrap import dedent
+
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from grblmachine import GrblMachine
@@ -15,12 +17,16 @@ class InstrumentController(QObject):
         self._deltaY = 10.0
         self._deltaZ = 10.0
 
-        self._probe_x = 0.0
-        self._probe_y = 0.0
-        self._probe_z = 0.0
+        self.probe_x = 0.0
+        self.probe_y = 0.0
+        self.probe_z = 0.0
 
         self._null_x = 0.0
         self._null_y = 0.0
+
+        self.is_calibrated_x = False
+        self.is_calibrated_y = False
+        self.is_calibrated_z = False
 
     def findDevices(self, token, **kwargs):
         return self._findMachive() and self._findFreqCounter()
@@ -85,10 +91,9 @@ class InstrumentController(QObject):
         return False, 'no command supplied, abort'
 
     def probeGoToNull(self, token, **kwargs):
-        # TODO move unit conversions to controller
         null_x = round(self._null_x / 1_000, 3)
         null_y = round(self._null_y / 1_000, 3)
-        null_z = round((4000 - self._probe_z) / 1_000)
+        null_z = round((4000 - self.probe_z) / 1_000)
 
         report_fn = kwargs.pop('fn_progress')
 
@@ -100,8 +105,8 @@ class InstrumentController(QObject):
             self._machine.flush_input()
             ok, response = self._machine.query_question()
             if ok:
-                x, y, z = response.split('|')[1][5:].split(',')
-                report_fn({'coords': f'X={x}\nY={y}\nZ={z}'})
+                self.probe_x, self.probe_y, self.probe_z = map(float, response.split('|')[1][5:].split(','))
+                report_fn({})
             time.sleep(0.5)
 
         res_move_y = self._machine.move_y(-null_y)
@@ -110,8 +115,8 @@ class InstrumentController(QObject):
             self._machine.flush_input()
             ok, response = self._machine.query_question()
             if ok:
-                x, y, z = response.split('|')[1][5:].split(',')
-                report_fn({'coords': f'X={x}\nY={y}\nZ={z}'})
+                self.probe_x, self.probe_y, self.probe_z = map(float, response.split('|')[1][5:].split(','))
+                report_fn({})
             time.sleep(0.5)
 
         res_move_z = self._machine.move_z(null_z)
@@ -120,12 +125,20 @@ class InstrumentController(QObject):
             self._machine.flush_input()
             ok, response = self._machine.query_question()
             if ok:
-                x, y, z = response.split('|')[1][5:].split(',')
-                report_fn({'coords': f'X={x}\nY={y}\nZ={z}'})
+                self.probe_x, self.probe_y, self.probe_z = map(float, response.split('|')[1][5:].split(','))
+                report_fn({})
             time.sleep(0.5)
 
         return \
             all(r for r, _ in (res_move_x, res_move_y, res_move_z)), ' '.join(m for _, m in (res_move_x, res_move_y, res_move_z))
+
+    def probeCalibrateZ(self, token, **kwargs):
+
+        report_fn = kwargs.pop('fn_progress')
+
+        self._machine.flush_input()
+
+        return self._machine.query_g()
 
     @property
     def deltaX(self):
@@ -150,3 +163,15 @@ class InstrumentController(QObject):
     @deltaZ.setter
     def deltaZ(self, value):
         self._deltaZ = value / 1_000  # convert um -> mm
+
+    @property
+    def probeState(self):
+        return dedent(f'''        Координаты:
+        X={self.probe_x}
+        Y={self.probe_y}
+        Z={self.probe_z}
+        
+        Калибровка:
+        X: {self.is_calibrated_x}
+        Y: {self.is_calibrated_y}
+        Z: {self.is_calibrated_z}''')
