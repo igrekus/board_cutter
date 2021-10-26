@@ -4,13 +4,15 @@ from PyQt5.QtCore import QRunnable, QObject, pyqtSignal, QThreadPool
 
 
 class Task(QRunnable):
-    def __init__(self, fn=None, fn_started=None, fn_finished=None, fn_failed=None, cancel_token=None, **kwargs):
+    def __init__(self, fn=None, fn_started=None, fn_finished=None, fn_failed=None,
+                 cancel_token=None, fn_progress=None, **kwargs):
         super().__init__()
         self.fn = fn
         self.fn_started = fn_started
         self.fn_finished = fn_finished
         self.fn_failed = fn_failed
         self.cancel_token = cancel_token
+        self.fn_progress = fn_progress
         self.kwargs = kwargs
 
     def run(self):
@@ -18,7 +20,7 @@ class Task(QRunnable):
             self.fn_started()
         result = False
         try:
-            result = self.fn(self.cancel_token, **self.kwargs)
+            result = self.fn(self.cancel_token, fn_progress=self.fn_progress, **self.kwargs)
         except Exception as ex:
             if self.fn_failed:
                 self.fn_failed(ex)
@@ -36,7 +38,7 @@ class BackgroundWorker(QObject):
         super().__init__(parent=parent)
         self._threads = QThreadPool()
 
-    def runTask(self, fn=None, fn_started=None, fn_finished=None, fn_failed=None, token=None, **kwargs):
+    def runTask(self, fn=None, fn_started=None, fn_finished=None, fn_failed=None, token=None, fn_progress=None, **kwargs):
         self._threads.start(
             Task(
                 fn=fn,
@@ -44,6 +46,7 @@ class BackgroundWorker(QObject):
                 fn_finished=fn_finished,
                 fn_failed=fn_failed,
                 cancel_token=token,
+                fn_progress=fn_progress,
                 **kwargs,
             )
         )
