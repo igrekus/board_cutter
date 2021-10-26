@@ -92,6 +92,14 @@ class InstrumentController(QObject):
             return self._machine.send_raw_command(command)
         return False, 'no command supplied, abort'
 
+    def _queryState(self):
+        self._machine.flush_input()
+        ok, response = self._machine.query_question()
+        if ok:
+            state, coords, *rest = response.split('|')  # TODO move to state class
+            self.state = state.lstrip('<')
+            self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
+
     def probeGoToNull(self, token, **kwargs):
         null_x = round(self._null_x / 1_000, 3)
         null_y = round(self._null_y / 1_000, 3)
@@ -104,37 +112,22 @@ class InstrumentController(QObject):
         res_move_x = self._machine.move_x(-null_x)
         self.state = 'Run'
         while 'Run' in self.state:  # TODO move to helper
-            self._machine.flush_input()
-            ok, response = self._machine.query_question()
-            if ok:
-                state, coords, *rest = response.split('|')
-                self.state = state.lstrip('<')
-                self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
-                report_fn({})
+            self._queryState()
+            report_fn({})
             time.sleep(0.5)
 
         res_move_y = self._machine.move_y(-null_y)
         self.state = 'Run'
         while 'Run' in self.state:
-            self._machine.flush_input()
-            ok, response = self._machine.query_question()
-            if ok:
-                state, coords, *rest = response.split('|')
-                self.state = state.lstrip('<')
-                self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
-                report_fn({})
+            self._queryState()
+            report_fn({})
             time.sleep(0.5)
 
         res_move_z = self._machine.move_z(null_z)
         self.state = 'Run'
         while 'Run' in self.state:
-            self._machine.flush_input()
-            ok, response = self._machine.query_question()
-            if ok:
-                state, coords, *rest = response.split('|')
-                self.state = state.lstrip('<')
-                self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
-                report_fn({})
+            self._queryState()
+            report_fn({})
             time.sleep(0.5)
 
         return \
@@ -146,25 +139,28 @@ class InstrumentController(QObject):
         self._machine.flush_input()
 
         #first step: z probing
-        if stateresponde() == "IDLE" and step1:
-            ser.flushInput()
-            writemsg("G10 L20 P1 X0Y0Z0") #set the null coordinates to G54
-            #print("Set the null in G54")
-            ser.flushInput()
-            writemsg("G54") #run in new cordinates
-            ser.flushInput()
-            writemsg("G38.2 Z-10 F10") #start probing
-            time.sleep(0.5)
-            while stateresponde() == "RUN":
-                #print("Running")
-                time.sleep(0.5)
-            #print("State is:" + stateresponde())
-            step1 = False
-            probe_z = Z_status("G54")-Z_status("PRB") # z in um
-            #print(str(probe_z))
-            print("Z probe done")
-            writemsg("G1 X0Y0Z0 F150")
-            ser.flushInput()
+        if self.state != 'Idle':
+            return False, 'machine busy'
+
+        # if stateresponde() == "IDLE" and step1:
+        #     ser.flushInput()
+        #     writemsg("G10 L20 P1 X0Y0Z0") #set the null coordinates to G54
+        #     #print("Set the null in G54")
+        #     ser.flushInput()
+        #     writemsg("G54") #run in new cordinates
+        #     ser.flushInput()
+        #     writemsg("G38.2 Z-10 F10") #start probing
+        #     time.sleep(0.5)
+        #     while stateresponde() == "RUN":
+        #         #print("Running")
+        #         time.sleep(0.5)
+        #     #print("State is:" + stateresponde())
+        #     step1 = False
+        #     probe_z = Z_status("G54")-Z_status("PRB") # z in um
+        #     #print(str(probe_z))
+        #     print("Z probe done")
+        #     writemsg("G1 X0Y0Z0 F150")
+        #     ser.flushInput()
 
         return self._machine.query_g()
 
