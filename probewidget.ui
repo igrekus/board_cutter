@@ -35,29 +35,7 @@
       <item>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QSpinBox" name="spinX">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="suffix">
-           <string> мкм</string>
-          </property>
-          <property name="maximum">
-           <number>1000000</number>
-          </property>
-          <property name="singleStep">
-           <number>1000</number>
-          </property>
-          <property name="value">
-           <number>10000</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="btnXMinus">
+         <widget class="QPushButton" name="btnGoToNull">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -65,116 +43,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>X-</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="btnXPlus">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>X+</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QSpinBox" name="spinY">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="suffix">
-           <string> мкм</string>
-          </property>
-          <property name="maximum">
-           <number>1000000</number>
-          </property>
-          <property name="singleStep">
-           <number>1000</number>
-          </property>
-          <property name="value">
-           <number>10000</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="btnYMinus">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Y-</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="btnYPlus">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Y+</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QSpinBox" name="spinZ">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="suffix">
-           <string> мкм</string>
-          </property>
-          <property name="maximum">
-           <number>1000000</number>
-          </property>
-          <property name="singleStep">
-           <number>1000</number>
-          </property>
-          <property name="value">
-           <number>10000</number>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QPushButton" name="btnZMinus">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Z-</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="btnZPlus">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Z+</string>
+           <string>NULL</string>
           </property>
          </widget>
         </item>
@@ -201,7 +70,7 @@
      <property name="title">
       <string>Состояние</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QPlainTextEdit" name="peditStatus"/>
       </item>

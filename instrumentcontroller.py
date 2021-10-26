@@ -1,3 +1,5 @@
+import time
+
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from grblmachine import GrblMachine
@@ -12,6 +14,13 @@ class InstrumentController(QObject):
         self._deltaX = 10.0  # mm
         self._deltaY = 10.0
         self._deltaZ = 10.0
+
+        self._probe_x = 0.0
+        self._probe_y = 0.0
+        self._probe_z = 0.0
+
+        self._null_x = 0.0
+        self._null_y = 0.0
 
     def findDevices(self, token, **kwargs):
         return self._findMachive() and self._findFreqCounter()
@@ -65,11 +74,58 @@ class InstrumentController(QObject):
     def askQuestion(self, token, **kwargs):
         return self._machine.query_question()
 
+    def askCoord(self, token, **kwargs):
+        ok, string = self._machine.query_question()
+        return ok, string
+
     def sendRawCommand(self, token, **kwargs):
         command = kwargs.pop('command', '')
         if command:
             return self._machine.send_raw_command(command)
         return False, 'no command supplied, abort'
+
+    def probeGoToNull(self, token, **kwargs):
+        # TODO move unit conversions to controller
+        null_x = round(self._null_x / 1_000, 3)
+        null_y = round(self._null_y / 1_000, 3)
+        null_z = round((4000 - self._probe_z) / 1_000)
+
+        report_fn = kwargs.pop('fn_progress')
+
+        self._machine.flush_input()
+
+        res_move_x = self._machine.move_x(-null_x)
+        response = 'Run'  # TODO move to helper
+        while 'Run' in response:
+            self._machine.flush_input()
+            ok, response = self._machine.query_question()
+            if ok:
+                x, y, z = response.split('|')[1][5:].split(',')
+                report_fn({'coords': f'X={x}\nY={y}\nZ={z}'})
+            time.sleep(0.5)
+
+        res_move_y = self._machine.move_y(-null_y)
+        response = 'Run'
+        while 'Run' in response:
+            self._machine.flush_input()
+            ok, response = self._machine.query_question()
+            if ok:
+                x, y, z = response.split('|')[1][5:].split(',')
+                report_fn({'coords': f'X={x}\nY={y}\nZ={z}'})
+            time.sleep(0.5)
+
+        res_move_z = self._machine.move_z(null_z)
+        response = 'Run'
+        while 'Run' in response:
+            self._machine.flush_input()
+            ok, response = self._machine.query_question()
+            if ok:
+                x, y, z = response.split('|')[1][5:].split(',')
+                report_fn({'coords': f'X={x}\nY={y}\nZ={z}'})
+            time.sleep(0.5)
+
+        return \
+            all(r for r, _ in (res_move_x, res_move_y, res_move_z)), ' '.join(m for _, m in (res_move_x, res_move_y, res_move_z))
 
     @property
     def deltaX(self):

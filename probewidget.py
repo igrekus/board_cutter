@@ -10,7 +10,9 @@ class ProbeWidget(QWidget):
 
     commStarted = pyqtSignal()
     commFinished = pyqtSignal()
-    moveFinished = pyqtSignal(TaskResult)
+    gotToNullFinished = pyqtSignal(TaskResult)
+    askCoordFinished = pyqtSignal(TaskResult)
+    reportCoord = pyqtSignal(dict)
 
     def __init__(self, parent=None, controller: InstrumentController=None):
         super().__init__(parent)
@@ -19,7 +21,7 @@ class ProbeWidget(QWidget):
         self.setAttribute(Qt.WA_DeleteOnClose)
 
         # create instance variables
-        self._ui = uic.loadUi('movewidget.ui', self)
+        self._ui = uic.loadUi('probewidget.ui', self)
 
         self._worker = BackgroundWorker(self)
         self._token = CancelToken()
@@ -29,54 +31,39 @@ class ProbeWidget(QWidget):
         self._connectSignals()
 
     def _connectSignals(self):
-        self.moveFinished.connect(self.on_moveFinished)
+        self.gotToNullFinished.connect(self.on_goToNullFinished)
+        self.askCoordFinished.connect(self.on_askCoordFinished)
+        self.reportCoord.connect(self.on_reportCoord)
 
     # worker dispatch
-    def _startWorker(self, fn, cb, **kwargs):
-        self._worker.runTask(fn=fn, fn_finished=cb, **kwargs)
+    def _startWorker(self, fn, cb, prg=None, **kwargs):
+        self._worker.runTask(fn=fn, fn_finished=cb, fn_progress=prg, **kwargs)
         self.commStarted.emit()
 
-    def _moveXMinus(self):
+    def _goToNull(self):
         self._startWorker(
-            fn=self._controller.moveXMinus,
-            cb=self._moveFinishedCallback,
+            fn=self._controller.probeGoToNull,
+            cb=self._goToNullFinishedCallback,
+            prg=self._reportCoord,
         )
 
-    def _moveXPlus(self):
+    def _askCoord(self):
         self._startWorker(
-            fn=self._controller.moveXPlus,
-            cb=self._moveFinishedCallback,
+            fn=self._controller.askCoord,
+            cb=self._askCoordFinishedCallback,
         )
 
-    def _moveYMinus(self):
-        self._startWorker(
-            fn=self._controller.moveYMinus,
-            cb=self._moveFinishedCallback,
-        )
+    def _goToNullFinishedCallback(self, result: tuple):
+        self.gotToNullFinished.emit(TaskResult(*result))
 
-    def _moveYPlus(self):
-        self._startWorker(
-            fn=self._controller.moveYPlus,
-            cb=self._moveFinishedCallback,
-        )
+    def _askCoordFinishedCallback(self, result: tuple):
+        self.askCoordFinished.emit(TaskResult(*result))
 
-    def _moveZMinus(self):
-        self._startWorker(
-            fn=self._controller.moveZMinus,
-            cb=self._moveFinishedCallback,
-        )
-
-    def _moveZPlus(self):
-        self._startWorker(
-            fn=self._controller.moveZPlus,
-            cb=self._moveFinishedCallback,
-        )
-
-    def _moveFinishedCallback(self, result: tuple):
-        self.moveFinished.emit(TaskResult(*result))
+    def _reportCoord(self, data):
+        self.reportCoord.emit(data)
 
     @pyqtSlot(TaskResult)
-    def on_moveFinished(self, result):
+    def on_goToNullFinished(self, result):
         ok, _ = result.values
         if not ok:
             print('error during move command, check logs')
@@ -85,39 +72,23 @@ class ProbeWidget(QWidget):
             return
         print('move finished')
         self.commFinished.emit()
+        self._askCoord()
+
+    @pyqtSlot(TaskResult)
+    def on_askCoordFinished(self, result):
+        ok, _ = result.values
+        if not ok:
+            print('error during coord query, check logs')
+            # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
+            self.commFinished.emit()
+            return
+        self.commFinished.emit()
+
+    @pyqtSlot(dict)
+    def on_reportCoord(self, data):
+        self._ui.peditStatus.setPlainText(data['coords'])
 
     @pyqtSlot()
-    def on_btnXMinus_clicked(self):
-        self._moveXMinus()
+    def on_btnGoToNull_clicked(self):
+        self._goToNull()
 
-    @pyqtSlot()
-    def on_btnXPlus_clicked(self):
-        self._moveXPlus()
-
-    @pyqtSlot()
-    def on_btnYMinus_clicked(self):
-        self._moveYMinus()
-
-    @pyqtSlot()
-    def on_btnYPlus_clicked(self):
-        self._moveYPlus()
-
-    @pyqtSlot()
-    def on_btnZMinus_clicked(self):
-        self._moveZMinus()
-
-    @pyqtSlot()
-    def on_btnZPlus_clicked(self):
-        self._moveZPlus()
-
-    @pyqtSlot(int)
-    def on_spinX_valueChanged(self, value):
-        self._controller.deltaX = value
-
-    @pyqtSlot(int)
-    def on_spinY_valueChanged(self, value):
-        self._controller.deltaY = value
-
-    @pyqtSlot(int)
-    def on_spinZ_valueChanged(self, value):
-        self._controller.deltaZ = value
