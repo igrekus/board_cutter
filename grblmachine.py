@@ -53,8 +53,12 @@ class GrblMachine:
             self._port.close()
 
     def read(self):
+        res = []
         if self._port.inWaiting() != 0:
-            return self._port.readall()
+            res.append(self._port.read_until(expected=b'ok'))
+            time.sleep(0.1)
+        if res:
+            return b''.join(res)
         print('no data available')
         return ''
 
