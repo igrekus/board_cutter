@@ -106,9 +106,9 @@ class ProbeWidget(QWidget):
 
     @pyqtSlot(TaskResult)
     def on_calibrateFinished(self, result):
-        ok, _ = result.values
+        ok, msg = result.values
         if not ok:
-            print('error during calibrations, check logs')
+            print(f'error during calibrations, check logs: {msg}')
             # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
             self.commFinished.emit()
             return
