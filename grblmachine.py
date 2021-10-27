@@ -54,13 +54,12 @@ class GrblMachine:
 
     def read(self):
         res = []
-        if self._port.inWaiting() != 0:
-            res.append(self._port.read_until(expected=b'ok'))
-            time.sleep(0.1)
-        if res:
-            return b''.join(res)
-        print('no data available')
-        return ''
+        while self._port.inWaiting() != 0:
+            res.append(self._port.read_until())
+            time.sleep(0.05)
+        if not res:
+            return b'no response, query status registers'
+        return b''.join(res)
 
     def write(self, data):
         data = str(data) + '\n'
