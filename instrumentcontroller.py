@@ -34,6 +34,9 @@ class ControllerState:
 
 
 class InstrumentController(QObject):
+    mill_len_mm = 6
+    mill_diam_mm = 3.175
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
@@ -162,6 +165,36 @@ class InstrumentController(QObject):
         report_fn = kwargs.pop('fn_progress')
         print('start calibrate X...')
 
+        self._queryState()
+        if self.state != 'Idle':
+            return False, 'machine busy'
+
+        self._machine.flush_input()
+        self._machine.move_x(-6)
+        self._waitHelper(report_fn)
+
+        height = -self.probe_z - self.mill_len_mm
+        self._machine.send_raw_command(f'G01 Z{height}')  # TODO switch to move_z helper when feed parameter is implemented
+        self._waitHelper(report_fn)
+
+        # self._machine.send_raw_command('G38.2 X0 F10')  # NOTE disable for debug
+        time.sleep(0.5)
+        self._waitHelper(report_fn)
+
+        self._machine.move_x(-6)
+        self._waitHelper(report_fn)
+
+        ok, raw = self._machine.query_hash()
+        state = ControllerState(raw)
+        self.probe_x = state.prb['x'] + self.mill_len_mm / 2  # compensate for mill half-diameter
+
+        self._machine.move_z(0)
+        self._waitHelper(report_fn)
+
+        self._machine.move(0, 0, 0)
+        self._waitHelper(report_fn)
+        self._machine.flush_input()
+
         print('done calibrating X')
         self.is_calibrated_x = True
         return self.is_calibrated_x, 'done calibrating X'
@@ -186,13 +219,14 @@ class InstrumentController(QObject):
 
         # TODO add error handling, check ok-s for all ops
         self._machine.flush_input()
-        ok, _ = self._machine.send_raw_command('G10 L20 P1 X0Y0Z0')  # magic spell to set the null coordinates for G54, use pg.GCodeSet(?)
+        ok, _ = self._machine.send_raw_command('G10 L20 P1 X0Y0Z0')  # magic spell to set the null coordinates for G54, TODO use pg.GCodeSet(?)
 
         self._machine.flush_input()
         ok, _ = self._machine.select_coord_sys_1()  # G54
 
-        # self._machine.flush_input()  # NOTE disable for debug, since it hinders other responses
-        # ok, _ = self._machine.send_raw_command('G38.2 Z-10 F10')  # use pg.GCodeStraightProbe
+        self._machine.flush_input()
+        # NOTE disable for debug, since it hinders other responses
+        # ok, _ = self._machine.send_raw_command('G38.2 Z-10 F10')  # TODO use pg.GCodeStraightProbe
 
         time.sleep(0.5)
         self._waitHelper(report_fn)  # wait until state register changes upon pin contact
