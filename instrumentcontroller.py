@@ -134,9 +134,9 @@ class InstrumentController(QObject):
             time.sleep(0.5)
 
     def probeGoToNull(self, token, **kwargs):
-        null_x = round(self._null_x / 1_000, 3)
-        null_y = round(self._null_y / 1_000, 3)
-        null_z = round((4000 - self.probe_z) / 1_000)
+        null_x = round(self._null_x, 3)
+        null_y = round(self._null_y, 3)
+        null_z = round(4 - self.probe_z, 3)
 
         report_fn = kwargs.pop('fn_progress')
 
