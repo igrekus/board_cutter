@@ -119,21 +119,20 @@ class GrblMachine:
         return ('ok' in self.send(str(pg.GCodeIncrementalDistanceMode()))), ''
 
     # TODO add generic move method with coord params
-    # TODO add feed (F) parameter
-    def move_x(self, delta):
+    def move_x(self, delta, feed_rate=150):
         print('move X...')
-        # TODO hack because lib doesn't support feed rate in linear move commands by default
-        command = f'{pg.GCodeLinearMove(X=delta)} {pg.GCodeFeedRate(150)}'
+        # NOTE hack because lib doesn't support feed rate in linear move commands by default
+        command = f'{pg.GCodeLinearMove(X=delta)} {pg.GCodeFeedRate(feed_rate)}'
         return ('ok' in self.send(command)), ''
 
-    def move_y(self, delta):
+    def move_y(self, delta, feed_rate=150):
         print('move Y...')
-        command = f'{pg.GCodeLinearMove(Y=delta)} {pg.GCodeFeedRate(150)}'
+        command = f'{pg.GCodeLinearMove(Y=delta)} {pg.GCodeFeedRate(feed_rate)}'
         return ('ok' in self.send(command)), ''
 
-    def move_z(self, delta):
+    def move_z(self, delta, feed_rate=150):
         print('move Z...')
-        command = f'{pg.GCodeLinearMove(Z=delta)} {pg.GCodeFeedRate(150)}'
+        command = f'{pg.GCodeLinearMove(Z=delta)} {pg.GCodeFeedRate(feed_rate)}'
         return ('ok' in self.send(command)), ''
 
     def query_g(self):
