@@ -42,6 +42,8 @@ class InstrumentController(QObject):
 
         self._machine = GrblMachine()
 
+        # TODO move machine state values into the machine class
+        # TODO make classes for all machine state responses
         self._deltaX = 10.0  # mm
         self._deltaY = 10.0
         self._deltaZ = 10.0
