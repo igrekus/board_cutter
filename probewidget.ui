@@ -48,21 +48,21 @@
       <item>
        <widget class="QPushButton" name="btnCalibrateX">
         <property name="text">
-         <string>Уст. X</string>
+         <string>Probe X</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnCalibrateY">
         <property name="text">
-         <string>Уст. Y</string>
+         <string>Probe Y</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnCalibrateZ">
         <property name="text">
-         <string>Уст. Z</string>
+         <string>Probe. Z</string>
         </property>
        </widget>
       </item>

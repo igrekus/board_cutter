@@ -157,9 +157,28 @@ class InstrumentController(QObject):
         return \
             all(r for r, _ in (res_move_x, res_move_y, res_move_z)), ' '.join(m for _, m in (res_move_x, res_move_y, res_move_z))
 
+    def probeCalibrateX(self, token, **kwargs):
+        self.is_calibrated_x = False
+        report_fn = kwargs.pop('fn_progress')
+        print('start calibrate X...')
+
+        print('done calibrating X')
+        self.is_calibrated_x = True
+        return self.is_calibrated_x, 'done calibrating X'
+
+    def probeCalibrateY(self, token, **kwargs):
+        self.is_calibrated_y = False
+        report_fn = kwargs.pop('fn_progress')
+        print('start calibrate Y...')
+
+        self.is_calibrated_y = True
+        print('done calibrating Y')
+        return self.is_calibrated_y, 'done calibrating Y'
+
     def probeCalibrateZ(self, token, **kwargs):
         self.is_calibrated_z = False
         report_fn = kwargs.pop('fn_progress')
+        print('start calibrate Z...')
 
         self._queryState()
         if self.state != 'Idle':

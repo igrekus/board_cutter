@@ -63,6 +63,20 @@ class ProbeWidget(QWidget):
             cb=self._askCoordFinishedCallback,
         )
 
+    def _calibrateX(self):
+        self._startWorker(
+            fn=self._controller.probeCalibrateX,
+            cb=self._probeCalibrateFinishedCallback,
+            prg=self._reportCoord,
+        )
+
+    def _calibrateY(self):
+        self._startWorker(
+            fn=self._controller.probeCalibrateY,
+            cb=self._probeCalibrateFinishedCallback,
+            prg=self._reportCoord,
+        )
+
     def _calibrateZ(self):
         self._startWorker(
             fn=self._controller.probeCalibrateZ,
@@ -121,6 +135,14 @@ class ProbeWidget(QWidget):
     @pyqtSlot()
     def on_btnGoToNull_clicked(self):
         self._goToNull()
+
+    @pyqtSlot()
+    def on_btnCalibrateX_clicked(self):
+        self._calibrateX()
+
+    @pyqtSlot()
+    def on_btnCalibrateY_clicked(self):
+        self._calibrateY()
 
     @pyqtSlot()
     def on_btnCalibrateZ_clicked(self):
