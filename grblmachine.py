@@ -135,6 +135,11 @@ class GrblMachine:
         command = f'{pg.GCodeLinearMove(Z=coord)} {pg.GCodeFeedRate(feed_rate)}'
         return ('ok' in self.send(command)), ''
 
+    def move(self, x, y, z, feed_rate=150):
+        print('free move...')
+        command = f'{pg.GCodeLinearMove(X=x, Y=y, Z=z)} {pg.GCodeFeedRate(feed_rate)}'
+        return ('ok' in self.send(command)), ''
+
     def query_g(self):
         print('query $G...')
         result = self.query('$G')
