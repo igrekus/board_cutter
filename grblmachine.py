@@ -95,7 +95,7 @@ class GrblMachine:
         return ('ok' in self.send(str(pg.GCodeFeedRate(value)))), ''
 
     def send_raw_command(self, command):
-        print('send raw command defaults...')
+        print('send raw command...')
         res = self.send(command)
         return ('ok' in res), res
 
