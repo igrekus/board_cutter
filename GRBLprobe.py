@@ -221,6 +221,7 @@ while True:
     # print("State is:" + stateresponde())
     cords = coordresponde()
     # print(f"X is {cords[0]} Y is {cords[1]} Z is {cords[2]}")
+
     txt = input("Will make z probe?:").upper()
     if txt == 'Y':
         step1 = True
@@ -244,6 +245,7 @@ while True:
         print("Z probe done")
         writemsg("G1 X0Y0Z0 F150")
         ser.flushInput()
+
     txt = input("Will make x probe?:").upper()
     if txt == 'Y':
         step2 = True
@@ -284,6 +286,7 @@ while True:
         print("X probe done")
         # print(str(probe_x))
         ser.flushInput()
+
     txt = input("Will make y probe?:").upper()
     if txt == 'Y':
         step3 = True
