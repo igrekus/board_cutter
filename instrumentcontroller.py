@@ -199,6 +199,7 @@ class InstrumentController(QObject):
 
         print('done calibrating X')
         self.is_calibrated_x = True
+        report_fn({})
         return self.is_calibrated_x, 'done calibrating X'
 
     def probeCalibrateY(self, token, **kwargs):
@@ -208,6 +209,7 @@ class InstrumentController(QObject):
 
         self.is_calibrated_y = True
         print('done calibrating Y')
+        report_fn({})
         return self.is_calibrated_y, 'done calibrating Y'
 
     def probeCalibrateZ(self, token, **kwargs):
@@ -237,12 +239,11 @@ class InstrumentController(QObject):
         state = ControllerState(raw)
         self.probe_z = state.g54['z'] - state.prb['z']
 
+        self._machine.send_raw_command('G1 X0Y0Z0 F150')
+        self._machine.flush_input()
+
         self.is_calibrated_z = True
         report_fn({})
-
-        self._machine.send_raw_command('G1 X0Y0Z0 F150')
-
-        self._machine.flush_input()
         print('done calibrating Z')
         return self.is_calibrated_z, 'done calibrating Z'
 
