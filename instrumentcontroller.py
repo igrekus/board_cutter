@@ -207,6 +207,36 @@ class InstrumentController(QObject):
         report_fn = kwargs.pop('fn_progress')
         print('start calibrate Y...')
 
+        self._queryState()
+        if self.state != 'Idle':
+            return False, 'machine busy'
+
+        self._machine.flush_input()
+        self._machine.move_y(delta=-6, feed_rate=150)
+        self._waitHelper(report_fn)
+
+        height = -self.probe_z - self.mill_len_mm
+        self._machine.send_raw_command(f'G01 Z{height}')
+        self._waitHelper(report_fn)
+
+        # self._machine.send_raw_command('G38.2 Y0 F10')  # NOTE disable for debug
+        time.sleep(0.5)
+        self._waitHelper(report_fn)
+
+        self._machine.move_y(delta=-6, feed_rate=150)
+        self._waitHelper(report_fn)
+
+        ok, raw = self._machine.query_hash()
+        state = ControllerState(raw)
+        self.probe_x = state.prb['y'] + self.mill_len_mm / 2  # compensate for mill half-diameter
+
+        self._machine.move_z(0)
+        self._waitHelper(report_fn)
+
+        self._machine.move(0, 0, 0)
+        self._waitHelper(report_fn)
+        self._machine.flush_input()
+
         self.is_calibrated_y = True
         print('done calibrating Y')
         report_fn({})
