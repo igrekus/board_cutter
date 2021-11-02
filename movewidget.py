@@ -10,7 +10,10 @@ class MoveWidget(QWidget):
 
     commStarted = pyqtSignal()
     commFinished = pyqtSignal()
+
     moveFinished = pyqtSignal(TaskResult)
+
+    reportCoord = pyqtSignal(dict)
 
     def __init__(self, parent=None, controller: InstrumentController=None):
         super().__init__(parent)
@@ -28,52 +31,67 @@ class MoveWidget(QWidget):
 
         self._connectSignals()
 
+        self._init()
+
+    def _init(self):
+        self._ui.peditStatus.setPlainText(self._controller.probeState)
+
     def _connectSignals(self):
         self.moveFinished.connect(self.on_moveFinished)
+        self.reportCoord.connect(self.on_reportCoord)
 
     # worker dispatch
-    def _startWorker(self, fn, cb, **kwargs):
-        self._worker.runTask(fn=fn, fn_finished=cb, **kwargs)
+    def _startWorker(self, fn, cb, prg=None, **kwargs):
+        self._worker.runTask(fn=fn, fn_finished=cb,fn_progress=prg, **kwargs)
         self.commStarted.emit()
 
     def _moveXMinus(self):
         self._startWorker(
             fn=self._controller.moveXMinus,
             cb=self._moveFinishedCallback,
+            prg=self._reportCoord,
         )
 
     def _moveXPlus(self):
         self._startWorker(
             fn=self._controller.moveXPlus,
             cb=self._moveFinishedCallback,
+            prg=self._reportCoord,
         )
 
     def _moveYMinus(self):
         self._startWorker(
             fn=self._controller.moveYMinus,
             cb=self._moveFinishedCallback,
+            prg=self._reportCoord,
         )
 
     def _moveYPlus(self):
         self._startWorker(
             fn=self._controller.moveYPlus,
             cb=self._moveFinishedCallback,
+            prg=self._reportCoord,
         )
 
     def _moveZMinus(self):
         self._startWorker(
             fn=self._controller.moveZMinus,
             cb=self._moveFinishedCallback,
+            prg=self._reportCoord,
         )
 
     def _moveZPlus(self):
         self._startWorker(
             fn=self._controller.moveZPlus,
             cb=self._moveFinishedCallback,
+            prg=self._reportCoord,
         )
 
     def _moveFinishedCallback(self, result: tuple):
         self.moveFinished.emit(TaskResult(*result))
+
+    def _reportCoord(self, data):
+        self.reportCoord.emit(data)
 
     @pyqtSlot(TaskResult)
     def on_moveFinished(self, result):
@@ -85,6 +103,10 @@ class MoveWidget(QWidget):
             return
         print('move finished')
         self.commFinished.emit()
+
+    @pyqtSlot(dict)
+    def on_reportCoord(self, data):
+        self._ui.peditStatus.setPlainText(self._controller.probeState)
 
     @pyqtSlot()
     def on_btnXMinus_clicked(self):

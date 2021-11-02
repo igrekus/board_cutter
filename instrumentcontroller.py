@@ -89,23 +89,35 @@ class InstrumentController(QObject):
     def closeConnections(self):
         self._machine.close()
 
+    def moveCommand(self, axis, delta, token, **kwargs):
+        report_fn = kwargs.pop('fn_progress')
+        ok, msg = False, ''
+        if axis == 'x':
+            ok, msg = self._machine.move_x(delta)
+        elif axis == 'y':
+            ok, msg = self._machine.move_y(delta)
+        elif axis == 'z':
+            ok, msg = self._machine.move_z(delta)
+        self._waitHelper(report_fn)
+        return ok, msg
+
     def moveXMinus(self, token, **kwargs):
-        return self._machine.move_x(-self.deltaX)
+        return self.moveCommand(axis='x', delta=-self.deltaX, token=token, **kwargs)
 
     def moveXPlus(self, token, **kwargs):
-        return self._machine.move_x(self.deltaX)
+        return self.moveCommand(axis='x', delta=self.deltaX, token=token, **kwargs)
 
     def moveYMinus(self, token, **kwargs):
-        return self._machine.move_y(-self.deltaY)
+        return self.moveCommand(axis='y', delta=-self.deltaY, token=token, **kwargs)
 
     def moveYPlus(self, token, **kwargs):
-        return self._machine.move_y(self.deltaY)
+        return self.moveCommand(axis='y', delta=self.deltaY, token=token, **kwargs)
 
     def moveZMinus(self, token, **kwargs):
-        return self._machine.move_z(-self.deltaZ)
+        return self.moveCommand(axis='z', delta=-self.deltaZ, token=token, **kwargs)
 
     def moveZPlus(self, token, **kwargs):
-        return self._machine.move_z(self.deltaZ)
+        return self.moveCommand(axis='z', delta=self.deltaZ, token=token, **kwargs)
 
     def askG(self, token, **kwargs):
         return self._machine.query_g()

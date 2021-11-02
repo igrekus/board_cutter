@@ -36,7 +36,6 @@ class ProbeWidget(QWidget):
         self._init()
 
     def _init(self):
-        # self._askCoord()
         self._ui.peditStatus.setPlainText(self._controller.probeState)
 
     def _connectSignals(self):
