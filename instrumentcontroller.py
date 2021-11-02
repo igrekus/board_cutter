@@ -7,6 +7,9 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from grblmachine import GrblMachine
 
 
+mock = True
+
+
 class ControllerState:
     def __init__(self, raw_data: str):
         self._raw_data = raw_data
@@ -179,7 +182,8 @@ class InstrumentController(QObject):
         self._machine.send_raw_command(f'G01 Z{height}')  # TODO switch to move_z helper when feed parameter is implemented
         self._waitHelper(report_fn)
 
-        # self._machine.send_raw_command('G38.2 X0 F10')  # NOTE disable for debug
+        if not mock:
+            self._machine.send_raw_command('G38.2 X0 F10')
         time.sleep(0.5)
         self._waitHelper(report_fn)
 
@@ -219,7 +223,8 @@ class InstrumentController(QObject):
         self._machine.send_raw_command(f'G01 Z{height}')
         self._waitHelper(report_fn)
 
-        # self._machine.send_raw_command('G38.2 Y0 F10')  # NOTE disable for debug
+        if not mock:
+            self._machine.send_raw_command('G38.2 Y0 F10')
         time.sleep(0.5)
         self._waitHelper(report_fn)
 
@@ -259,8 +264,8 @@ class InstrumentController(QObject):
         ok, _ = self._machine.select_coord_sys_1()  # G54
 
         self._machine.flush_input()
-        # NOTE disable for debug, since it hinders other responses
-        # ok, _ = self._machine.send_raw_command('G38.2 Z-10 F10')  # TODO use pg.GCodeStraightProbe
+        if not mock:
+            ok, _ = self._machine.send_raw_command('G38.2 Z-10 F10')  # TODO use pg.GCodeStraightProbe
 
         time.sleep(0.5)
         self._waitHelper(report_fn)  # wait until state register changes upon pin contact
