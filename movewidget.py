@@ -133,11 +133,8 @@ class MoveWidget(QWidget):
         self._moveZPlus()
 
     @pyqtSlot(int)
-    def on_spinX_valueChanged(self, value):
+    def on_spinPlane_valueChanged(self, value):
         self._controller.deltaX = value
-
-    @pyqtSlot(int)
-    def on_spinY_valueChanged(self, value):
         self._controller.deltaY = value
 
     @pyqtSlot(int)
