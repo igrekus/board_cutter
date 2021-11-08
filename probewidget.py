@@ -14,6 +14,7 @@ class ProbeWidget(QWidget):
     gotToNullFinished = pyqtSignal(TaskResult)
     askCoordFinished = pyqtSignal(TaskResult)
     calibrateFinished = pyqtSignal(TaskResult)
+    setNullFinished = pyqtSignal(TaskResult)
 
     reportCoord = pyqtSignal(dict)
 
@@ -42,6 +43,7 @@ class ProbeWidget(QWidget):
         self.gotToNullFinished.connect(self.on_goToNullFinished)
         self.askCoordFinished.connect(self.on_askCoordFinished)
         self.calibrateFinished.connect(self.on_calibrateFinished)
+        self.setNullFinished.connect(self.on_setNullFinished)
         self.reportCoord.connect(self.on_reportCoord)
 
     # worker dispatch
@@ -83,6 +85,13 @@ class ProbeWidget(QWidget):
             prg=self._reportCoord,
         )
 
+    def _setNull(self):
+        self._startWorker(
+            fn=self._controller.probeSetNull,
+            cb=self._probeSetNullFinishedCallback,
+            prg=self._reportCoord,
+        )
+
     def _goToNullFinishedCallback(self, result: tuple):
         self.gotToNullFinished.emit(TaskResult(*result))
 
@@ -91,6 +100,9 @@ class ProbeWidget(QWidget):
 
     def _probeCalibrateFinishedCallback(self, result: tuple):
         self.calibrateFinished.emit(TaskResult(*result))
+
+    def _probeSetNullFinishedCallback(self, result: tuple):
+        self.setNullFinished.emit(TaskResult(*result))
 
     def _reportCoord(self, data):
         self.reportCoord.emit(data)
@@ -127,6 +139,16 @@ class ProbeWidget(QWidget):
             return
         self.commFinished.emit()
 
+    @pyqtSlot(TaskResult)
+    def on_setNullFinished(self, result):
+        ok, msg = result.values
+        if not ok:
+            print(f'error during setting new NULL coords, check logs: {msg}')
+            # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
+            self.commFinished.emit()
+            return
+        self.commFinished.emit()
+
     @pyqtSlot(dict)
     def on_reportCoord(self, data):
         self._ui.peditStatus.setPlainText(self._controller.probeState)
@@ -147,3 +169,6 @@ class ProbeWidget(QWidget):
     def on_btnCalibrateZ_clicked(self):
         self._calibrateZ()
 
+    @pyqtSlot()
+    def on_btnSetNull_clicked(self):
+        self._setNull()

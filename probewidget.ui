@@ -41,7 +41,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>NULL</string>
+         <string>Go to NULL</string>
         </property>
        </widget>
       </item>
@@ -63,6 +63,13 @@
        <widget class="QPushButton" name="btnCalibrateZ">
         <property name="text">
          <string>Probe. Z</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnSetNull">
+        <property name="text">
+         <string>Set NULL</string>
         </property>
        </widget>
       </item>

@@ -294,6 +294,26 @@ class InstrumentController(QObject):
         print('done calibrating Z')
         return self.is_calibrated_z, 'done calibrating Z'
 
+    def probeSetNull(self, token, **kwargs):
+        print('setting new NULL...')
+
+        self._machine.flush_input()
+        ok, response = self._machine.query_question()
+        if ok:
+            state, coords, *rest = response.split('|')  # TODO move to state class
+            self.state = state.lstrip('<')
+            coords_x, coords_y, coords_z = map(float, coords[5:].split(','))
+        else:
+            coords_x, coords_y = 0, 0
+
+        self._null_x = coords_x - self.probe_x
+        self._null_y = coords_y - self.probe_y
+
+        ok, msg = self.probeGoToNull(token, **kwargs)
+
+        print('done setting new NULL')
+        return ok, msg
+
     @property
     def deltaX(self):
         return self._deltaX
