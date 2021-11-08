@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSlot
 
 from backgroundworker import BackgroundWorker, CancelToken
+from cutwidget import CutWidget
 from instrumentcontroller import InstrumentController
 from movewidget import MoveWidget
 from probewidget import ProbeWidget
@@ -29,10 +30,12 @@ class MainWindow(QMainWindow):
         self._rawWidget = RawWidget(parent=self, controller=self._controller)
         self._moveWidget = MoveWidget(parent=self, controller=self._controller)
         self._probeWidget = ProbeWidget(parent=self, controller=self._controller)
+        self._cutWidget = CutWidget(parent=self, controller=self._controller)
 
         self._ui.tabMain.addTab(self._rawWidget, 'Прямой доступ')
         self._ui.tabMain.addTab(self._moveWidget, 'Перемещение')
         self._ui.tabMain.addTab(self._probeWidget, 'Калибровка')
+        self._ui.tabMain.addTab(self._cutWidget, 'Резка по шаблону')
         self._ui.tabMain.setCurrentIndex(0)
 
         self._modeBeforeConnect()
@@ -48,6 +51,9 @@ class MainWindow(QMainWindow):
 
         self._probeWidget.commStarted.connect(self.on_commStarted)
         self._probeWidget.commFinished.connect(self.on_commFinished)
+
+        self._cutWidget.commStarted.connect(self.on_commStarted)
+        self._cutWidget.commFinished.connect(self.on_commFinished)
 
     @pyqtSlot()
     def on_btnConnect_clicked(self):
