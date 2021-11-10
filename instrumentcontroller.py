@@ -51,6 +51,8 @@ class InstrumentController(QObject):
         self._deltaY = 10.0
         self._deltaZ = 10.0
 
+        self.feedRate = 150
+
         self.probe_x = 0.0
         self.probe_y = 0.0
         self.probe_z = 0.0
@@ -89,35 +91,35 @@ class InstrumentController(QObject):
     def closeConnections(self):
         self._machine.close()
 
-    def moveCommand(self, axis, delta, token, **kwargs):
+    def moveCommand(self, axis, delta, feed_rate, token, **kwargs):
         report_fn = kwargs.pop('fn_progress')
         ok, msg = False, ''
         if axis == 'x':
-            ok, msg = self._machine.move_x(delta)
+            ok, msg = self._machine.move_x(delta=delta, feed_rate=feed_rate)
         elif axis == 'y':
-            ok, msg = self._machine.move_y(delta)
+            ok, msg = self._machine.move_y(delta=delta, feed_rate=feed_rate)
         elif axis == 'z':
-            ok, msg = self._machine.move_z(delta)
+            ok, msg = self._machine.move_z(delta=delta, feed_rate=feed_rate)
         self._waitHelper(report_fn)
         return ok, msg
 
     def moveXMinus(self, token, **kwargs):
-        return self.moveCommand(axis='x', delta=-self.deltaX, token=token, **kwargs)
+        return self.moveCommand(axis='x', delta=-self.deltaX, feed_rate=self.feedRate, token=token, **kwargs)
 
     def moveXPlus(self, token, **kwargs):
-        return self.moveCommand(axis='x', delta=self.deltaX, token=token, **kwargs)
+        return self.moveCommand(axis='x', delta=self.deltaX, feed_rate=self.feedRate, token=token, **kwargs)
 
     def moveYMinus(self, token, **kwargs):
-        return self.moveCommand(axis='y', delta=-self.deltaY, token=token, **kwargs)
+        return self.moveCommand(axis='y', delta=-self.deltaY, feed_rate=self.feedRate, token=token, **kwargs)
 
     def moveYPlus(self, token, **kwargs):
-        return self.moveCommand(axis='y', delta=self.deltaY, token=token, **kwargs)
+        return self.moveCommand(axis='y', delta=self.deltaY, feed_rate=self.feedRate, token=token, **kwargs)
 
     def moveZMinus(self, token, **kwargs):
-        return self.moveCommand(axis='z', delta=-self.deltaZ, token=token, **kwargs)
+        return self.moveCommand(axis='z', delta=-self.deltaZ, feed_rate=self.feedRate, token=token, **kwargs)
 
     def moveZPlus(self, token, **kwargs):
-        return self.moveCommand(axis='z', delta=self.deltaZ, token=token, **kwargs)
+        return self.moveCommand(axis='z', delta=self.deltaZ, feed_rate=self.feedRate, token=token, **kwargs)
 
     def askG(self, token, **kwargs):
         return self._machine.query_g()
@@ -320,7 +322,7 @@ class InstrumentController(QObject):
 
     @deltaX.setter
     def deltaX(self, value):
-        self._deltaX = value / 1_000  # convert um -> mm
+        self._deltaX = value
 
     @property
     def deltaY(self):
@@ -328,7 +330,7 @@ class InstrumentController(QObject):
 
     @deltaY.setter
     def deltaY(self, value):
-        self._deltaY = value / 1_000  # convert um -> mm
+        self._deltaY = value
 
     @property
     def deltaZ(self):
@@ -336,7 +338,7 @@ class InstrumentController(QObject):
 
     @deltaZ.setter
     def deltaZ(self, value):
-        self._deltaZ = value / 1_000  # convert um -> mm
+        self._deltaZ = value
 
     @property
     def probeState(self):
@@ -347,6 +349,9 @@ class InstrumentController(QObject):
         X={self.probe_x}
         Y={self.probe_y}
         Z={self.probe_z}
+        
+        Feed rate:
+        FR={self.feedRate}
         
         Калибровка:
         X: {self.is_calibrated_x}
