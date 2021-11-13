@@ -10,7 +10,7 @@ from grblmachine import GrblMachine
 mock = False
 
 
-class ControllerState:
+class HashState:
     def __init__(self, raw_data: str):
         self._raw_data = raw_data
         self._parse_raw_data()
@@ -18,6 +18,9 @@ class ControllerState:
     def _parse_raw_data(self):
         parts = self._raw_data.strip().split('\n')[:-1]
         self._state = dict(self._parse_part(part) for part in parts)
+
+    def __str__(self):
+        return f'<CalibrationState ($#: {self._state}>'
 
     @staticmethod
     def _parse_part(part: str):
@@ -65,6 +68,8 @@ class InstrumentController(QObject):
         self.is_calibrated_x = False
         self.is_calibrated_y = False
         self.is_calibrated_z = False
+
+        self._calib_state = None
 
     def findDevices(self, token, **kwargs):
         return self._findMachive() and self._findFreqCounter()
@@ -148,6 +153,11 @@ class InstrumentController(QObject):
             self.state = state.lstrip('<')
             self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
 
+    def _queryCalibrationsState(self):
+        self._machine.flush_input()
+        ok, raw = self._machine.query_hash()
+        self._calib_state = HashState(raw)
+
     def _waitHelper(self, report_fn):
         self.state = 'Run'
         while 'Run' in self.state:
@@ -204,9 +214,8 @@ class InstrumentController(QObject):
         self._machine.move_x(-6)
         self._waitHelper(report_fn)
 
-        ok, raw = self._machine.query_hash()
-        state = ControllerState(raw)
-        self.probe_x = state.prb['x'] + self.mill_len_mm / 2  # compensate for mill half-diameter
+        self._queryCalibrationsState()
+        self.probe_x = self._calib_state.prb['x'] + self.mill_len_mm / 2  # compensate for mill half-diameter
 
         self._machine.move_z(0)
         self._waitHelper(report_fn)
@@ -245,9 +254,8 @@ class InstrumentController(QObject):
         self._machine.move_y(delta=-6, feed_rate=150)
         self._waitHelper(report_fn)
 
-        ok, raw = self._machine.query_hash()
-        state = ControllerState(raw)
-        self.probe_x = state.prb['y'] + self.mill_len_mm / 2  # compensate for mill half-diameter
+        self._queryCalibrationsState()
+        self.probe_x = self._calib_state.prb['y'] + self.mill_len_mm / 2  # compensate for mill half-diameter
 
         self._machine.move_z(0)
         self._waitHelper(report_fn)
@@ -284,9 +292,8 @@ class InstrumentController(QObject):
         time.sleep(0.5)
         self._waitHelper(report_fn)  # wait until state register changes upon pin contact
 
-        ok, raw = self._machine.query_hash()
-        state = ControllerState(raw)
-        self.probe_z = state.g54['z'] - state.prb['z']
+        self._queryCalibrationsState()
+        self.probe_z = self._calib_state.g54['z'] - self._calib_state.prb['z']
 
         self._machine.send_raw_command('G1 X0Y0Z0 F150')
         self._machine.flush_input()
@@ -357,3 +364,7 @@ class InstrumentController(QObject):
         X: {self.is_calibrated_x}
         Y: {self.is_calibrated_y}
         Z: {self.is_calibrated_z}''')
+
+    @property
+    def calibrationState(self):
+        return self._calib_state
