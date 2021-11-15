@@ -81,6 +81,8 @@ class RawWidget(QWidget):
             return
         self._ui.peditStatus.setPlainText(f'{msg}\n')
         self.commFinished.emit()
+        self._ui.editCommand.setFocus()
+        self._ui.editCommand.selectAll()
 
     @pyqtSlot(TaskResult)
     def on_askFinished(self, result: TaskResult):
@@ -93,6 +95,8 @@ class RawWidget(QWidget):
             return
         self._ui.peditStatus.setPlainText(f'{msg}\n')
         self.commFinished.emit()
+        self._ui.editCommand.setFocus()
+        self._ui.editCommand.selectAll()
 
     @pyqtSlot()
     def on_btnCommand_clicked(self):
@@ -109,3 +113,7 @@ class RawWidget(QWidget):
     @pyqtSlot()
     def on_btnAskQuestion_clicked(self):
         self._askQuestion()
+
+    @pyqtSlot()
+    def on_editCommand_returnPressed(self):
+        self.on_btnCommand_clicked()
