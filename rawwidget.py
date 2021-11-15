@@ -76,6 +76,7 @@ class RawWidget(QWidget):
         if not ok:
             print(f'error during raw command: {msg}')
             # QMessageBox.information(self, 'Внимание', 'Контроллер GRBL не найден, проверьте подключение.')
+            self._ui.peditStatus.setPlainText(f'raw command failed: GRBL {msg}\n')
             self.commFinished.emit()
             return
         self._ui.peditStatus.setPlainText(f'{msg}\n')
@@ -85,8 +86,9 @@ class RawWidget(QWidget):
     def on_askFinished(self, result: TaskResult):
         ok, msg = result.values
         if not ok:
-            print('error during ask command, check logs')
+            print(f'error during ask command, check logs: {msg}')
             # QMessageBox.information(self, 'Внимание', 'Ошибка выполнения запроса к GRBL, подробности в логах.')
+            self._ui.peditStatus.setPlainText(f'query command failed: GRBL {msg}\n')
             self.commFinished.emit()
             return
         self._ui.peditStatus.setPlainText(f'{msg}\n')
