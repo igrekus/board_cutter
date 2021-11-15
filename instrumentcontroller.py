@@ -5,40 +5,18 @@ from textwrap import dedent
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from grblmachine import GrblMachine
+from gcodeparams import GcodeParams
 
 
 mock = False
 
 
-class HashState:
-    def __init__(self, raw_data: str):
-        self._raw_data = raw_data
-        self._parse_raw_data()
+'''
+<Idle|MPos:0.000,0.000,0.000|FS:0,0|WCO:0.000,0.000,0.000>
+<Idle|MPos:0.000,0.000,0.000|FS:0,0|Ov:100,100,100>
+<Idle|MPos:0.000,0.000,0.000|FS:0,0>
 
-    def _parse_raw_data(self):
-        parts = self._raw_data.strip().split('\n')[:-1]
-        self._state = dict(self._parse_part(part) for part in parts)
-
-    def __str__(self):
-        return f'<CalibrationState ($#: {self._state}>'
-
-    @staticmethod
-    def _parse_part(part: str):
-        marker, *coords = part.strip().lstrip('[').rstrip(']').split(':')
-        if 'TLO' in marker:
-            return marker, {'x': float(coords[0])}
-        x, y, z = map(float, coords[0].split(','))
-        return marker, {'x': x, 'y': y, 'z': z}
-
-    @property
-    def g54(self):
-        return self._state['G54']
-
-    @property
-    def prb(self):
-        return self._state['PRB']
-
-
+'''
 class InstrumentController(QObject):
     mill_len_mm = 6
     mill_diam_mm = 3.175
@@ -156,7 +134,7 @@ class InstrumentController(QObject):
     def _queryCalibrationsState(self):
         self._machine.flush_input()
         ok, raw = self._machine.query_hash()
-        self._calib_state = HashState(raw)
+        self._calib_state = GcodeParams(raw)
 
     def _waitHelper(self, report_fn):
         self.state = 'Run'
