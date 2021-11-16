@@ -34,7 +34,7 @@ class MoveWidget(QWidget):
         self._init()
 
     def _init(self):
-        self._ui.peditStatus.setPlainText(self._controller.probeState)
+        self._ui.peditStatus.setPlainText(self._controller.instrumentState)
 
     def _connectSignals(self):
         self.moveFinished.connect(self.on_moveFinished)
@@ -106,7 +106,7 @@ class MoveWidget(QWidget):
 
     @pyqtSlot(dict)
     def on_reportCoord(self, data):
-        self._ui.peditStatus.setPlainText(self._controller.probeState)
+        self._ui.peditStatus.setPlainText(self._controller.instrumentState)
 
     @pyqtSlot()
     def on_btnXMinus_clicked(self):

@@ -37,7 +37,7 @@ class ProbeWidget(QWidget):
         self._init()
 
     def _init(self):
-        self._ui.peditStatus.setPlainText(self._controller.probeState)
+        self._ui.peditStatus.setPlainText(self._controller.instrumentState)
 
     def _connectSignals(self):
         self.gotToNullFinished.connect(self.on_goToNullFinished)
@@ -58,11 +58,6 @@ class ProbeWidget(QWidget):
             prg=self._reportCoord,
         )
 
-    def _askCoord(self):
-        self._startWorker(
-            fn=self._controller.askCoord,
-            cb=self._askCoordFinishedCallback,
-        )
 
     def _calibrateX(self):
         self._startWorker(
@@ -151,7 +146,7 @@ class ProbeWidget(QWidget):
 
     @pyqtSlot(dict)
     def on_reportCoord(self, data):
-        self._ui.peditStatus.setPlainText(self._controller.probeState)
+        self._ui.peditStatus.setPlainText(self._controller.instrumentState)
 
     @pyqtSlot()
     def on_btnGoToNull_clicked(self):

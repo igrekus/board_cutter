@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from grblmachine import GrblMachine
 from gcodeparams import GcodeParams
-
+from realtimestatus import RealtimeStatus, State
 
 mock = True
 
@@ -42,6 +42,7 @@ class InstrumentController(QObject):
         self.is_calibrated_z = False
 
         self._calib_state = None
+        self._rt_state = RealtimeStatus.default()
 
     def findDevices(self, token, **kwargs):
         return self._findMachive() and self._findFreqCounter()
@@ -107,10 +108,6 @@ class InstrumentController(QObject):
     def askQuestion(self, token, **kwargs):
         return self._machine.query_question()
 
-    def askCoord(self, token, **kwargs):
-        ok, string = self._machine.query_question()
-        return ok, string
-
     def sendRawCommand(self, token, **kwargs):
         command = kwargs.pop('command', '')
         if command:
@@ -120,10 +117,13 @@ class InstrumentController(QObject):
     def _queryState(self):
         self._machine.flush_input()
         ok, response = self._machine.query_question()
+        self._rt_state = RealtimeStatus(response)
         if ok:
-            state, coords, *rest = response.split('|')  # TODO move to state class
-            self.state = state.lstrip('<')
-            self.probe_x, self.probe_y, self.probe_z = map(float, coords[5:].split(','))
+            # TODO this is a hack to not break previous state implementation
+            self.probe_x = self._rt_state.probe['x']
+            self.probe_y = self._rt_state.probe['y']
+            self.probe_z = self._rt_state.probe['z']
+            self.state = self._rt_state.state
 
     def _queryCalibrationsState(self):
         self._machine.flush_input()
@@ -131,8 +131,8 @@ class InstrumentController(QObject):
         self._calib_state = GcodeParams(raw)
 
     def _waitHelper(self, report_fn):
-        self.state = 'Run'
-        while 'Run' in self.state:
+        self._queryState()
+        while self._rt_state.state == State.Run:
             self._queryState()
             report_fn({})
             time.sleep(0.5)
@@ -320,7 +320,7 @@ class InstrumentController(QObject):
         self._deltaZ = value
 
     @property
-    def probeState(self):
+    def instrumentState(self):
         return dedent(f'''        Состояние:
         PRB: {self.state}
         

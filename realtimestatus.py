@@ -34,7 +34,8 @@ class RealtimeStatus:
         return f'<RealtimeState(?) {self._state}>'
 
     def _parse_raw_data(self):
-        state, *rest = self._raw.strip()[1:-1].split('|')
+        temp = self._raw.strip().split('\n')[0].strip()
+        state, *rest = temp[1:-1].split('|')
         self._parse_state(state)
         for line in rest:
             self._parse_line(line)
@@ -54,3 +55,16 @@ class RealtimeStatus:
             self._state.update({'wco': {k: v for k, v in zip(('x', 'y', 'z'), map(float, line.split(':')[1].split(',')))}})
         elif line.startswith('Ov'):
             self._state.update({'ov': {k: v for k, v in zip(('x', 'y', 'z'), map(float, line.split(':')[1].split(',')))}})
+
+    @property
+    def probe(self):
+        return self._state['mpos']
+
+    @classmethod
+    def default(cls):
+        # TODO add normal constructor, move string parser to 'from_string' constructor
+        return cls('<Idle|MPos:0.000,0.000,0.000|FS:0,0>')
+
+    @property
+    def state(self):
+        return self._state['state']
