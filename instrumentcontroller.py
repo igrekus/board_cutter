@@ -8,15 +8,9 @@ from grblmachine import GrblMachine
 from gcodeparams import GcodeParams
 
 
-mock = False
+mock = True
 
 
-'''
-<Idle|MPos:0.000,0.000,0.000|FS:0,0|WCO:0.000,0.000,0.000>
-<Idle|MPos:0.000,0.000,0.000|FS:0,0|Ov:100,100,100>
-<Idle|MPos:0.000,0.000,0.000|FS:0,0>
-
-'''
 class InstrumentController(QObject):
     mill_len_mm = 6
     mill_diam_mm = 3.175

@@ -23,6 +23,9 @@ class GcodeParams:
 
         self._parse_raw_data()
 
+    def __str__(self):
+        return f'<CalibrationState($#) {self._state}>'
+
     def _parse_raw_data(self):
         lines = self._raw_data.strip().split('\n')[:-1]
         for line in lines:
@@ -33,9 +36,6 @@ class GcodeParams:
                 self._state['PRB'] = self._parse_prb(line)
             else:
                 self._state[line[:3]] = self._parse_g(line)
-
-    def __str__(self):
-        return f'<CalibrationState($#) {self._state}>'
 
     @staticmethod
     def _parse_tlo(raw: str):
