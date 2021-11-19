@@ -40,9 +40,10 @@ class GrblMachine:
                 s.write(b'$\n')
                 time.sleep(0.5)
                 ans = s.readall()
+                s.close()
                 if b'HLP' in ans:
                     print(f'GRBL found at {port}')
-                    self._port = s
+                    self._port = serial.Serial(port=port, baudrate=115200, timeout=0.5)
                     return True
         else:
             print('GRBL not found, abort')
