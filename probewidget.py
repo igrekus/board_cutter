@@ -40,11 +40,11 @@ class ProbeWidget(QWidget):
         self._ui.peditStatus.setPlainText(self._controller.instrumentState)
 
     def _connectSignals(self):
-        self.gotToNullFinished.connect(self.on_goToNullFinished)
-        self.askCoordFinished.connect(self.on_askCoordFinished)
-        self.calibrateFinished.connect(self.on_calibrateFinished)
-        self.setNullFinished.connect(self.on_setNullFinished)
-        self.reportCoord.connect(self.on_reportCoord)
+        self.gotToNullFinished.connect(self.on_goToNullFinished, type=Qt.QueuedConnection)
+        self.askCoordFinished.connect(self.on_askCoordFinished, type=Qt.QueuedConnection)
+        self.calibrateFinished.connect(self.on_calibrateFinished, type=Qt.QueuedConnection)
+        self.setNullFinished.connect(self.on_setNullFinished, type=Qt.QueuedConnection)
+        self.reportCoord.connect(self.on_reportCoord, type=Qt.QueuedConnection)
 
     # worker dispatch
     def _startWorker(self, fn, cb, prg=None, **kwargs):

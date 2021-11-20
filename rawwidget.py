@@ -30,8 +30,8 @@ class RawWidget(QWidget):
         self._connectSignals()
 
     def _connectSignals(self):
-        self.askFinished.connect(self.on_askFinished)
-        self.commandFinished.connect(self.on_commandFinished)
+        self.askFinished.connect(self.on_askFinished, type=Qt.QueuedConnection)
+        self.commandFinished.connect(self.on_commandFinished, type=Qt.QueuedConnection)
 
     # worker dispatch
     def _startWorker(self, fn, cb, **kwargs):

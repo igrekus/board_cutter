@@ -37,8 +37,8 @@ class MoveWidget(QWidget):
         self._ui.peditStatus.setPlainText(self._controller.instrumentState)
 
     def _connectSignals(self):
-        self.moveFinished.connect(self.on_moveFinished)
-        self.reportCoord.connect(self.on_reportCoord)
+        self.moveFinished.connect(self.on_moveFinished, type=Qt.QueuedConnection)
+        self.reportCoord.connect(self.on_reportCoord, type=Qt.QueuedConnection)
 
     # worker dispatch
     def _startWorker(self, fn, cb, prg=None, **kwargs):
