@@ -27,10 +27,11 @@ def readmsg(lst):
         lst.insert(x, txt.decode(encoding="ascii")[0:-1])
         x += 1
         time.sleep(0.1)
-    return
+    print(lst)
 
 
 def writemsg(txt):
+    print(txt)
     txt += '\r'
     ser.write(txt.encode(encoding="ascii"))
     time.sleep(0.1)
@@ -155,6 +156,8 @@ while True:
         ser.flushInput()
         writemsg("G90")
         writemsg("G55")
+        # segm = ((0, 0),
+        #         (-2.625, 0.275))
         writemsg(f"G1X{segm[1][0]}Y{segm[1][1]} F150")  # go to start of segment
         # print(f"G1X{segm[seg][0]}Y{segm[seg][1]} F150")
         writemsg("G91")

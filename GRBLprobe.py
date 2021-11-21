@@ -326,6 +326,7 @@ while True:
             time.sleep(0.5)
         print("Y probe done")
         ser.flushInput()
+
     # print(f"x: {str(probe_x)} y: {str(probe_y)} z: {str(probe_z)}")
     null_cords()
     # print(f"x: {str(X_null)} y: {str(Y_null)} z: {str(probe_z)}")
