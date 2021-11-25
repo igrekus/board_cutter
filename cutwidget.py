@@ -47,9 +47,11 @@ class CutWidget(QWidget):
 
     def _startCut(self):
         self._startWorker(
-            fn=self._controller.moveXMinus,
+            fn=self._controller.execCutProgram,
             cb=self._cutFinishedCallback,
+            token=self._token,
             prg=self._reportCoord,
+            cuts={'lol': 'cuts'}
         )
 
     def _cutFinishedCallback(self, result: tuple):

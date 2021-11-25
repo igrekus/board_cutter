@@ -295,6 +295,19 @@ class InstrumentController(QObject):
         print('done setting new NULL')
         return ok, msg
 
+    def execCutProgram(self, token, **kwargs):
+        cuts = kwargs.pop('cuts')
+        report_fn = kwargs.pop('fn_progress')
+        print('executing cut program...')
+        print(f'cuts: {cuts}')
+        print(f'token: {token}')
+
+        self._waitHelper(report_fn)
+        ok, msg = True, 'ok'
+
+        print('all cuts finished')
+        return ok, msg
+
     @property
     def deltaX(self):
         return self._deltaX
