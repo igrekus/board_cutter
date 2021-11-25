@@ -33,6 +33,9 @@ class CancelToken:
     def __init__(self):
         self.cancelled = False
 
+    def __str__(self):
+        return f'<{self.__class__.__name__}> (cancelled={self.cancelled})'
+
 
 class BackgroundWorker(QObject):
     def __init__(self, parent=None):
