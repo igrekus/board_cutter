@@ -11,7 +11,7 @@ class CutWidget(QWidget):
     commStarted = pyqtSignal()
     commFinished = pyqtSignal()
 
-    moveFinished = pyqtSignal(TaskResult)
+    cutFinished = pyqtSignal(TaskResult)
 
     reportCoord = pyqtSignal(dict)
 
@@ -22,7 +22,7 @@ class CutWidget(QWidget):
         self.setAttribute(Qt.WA_DeleteOnClose)
 
         # create instance variables
-        self._ui = uic.loadUi('movewidget.ui', self)
+        self._ui = uic.loadUi('cutwidget.ui', self)
 
         self._worker = BackgroundWorker(self)
         self._token = CancelToken()
@@ -37,7 +37,7 @@ class CutWidget(QWidget):
         self._ui.peditStatus.setPlainText(self._controller.instrumentState)
 
     def _connectSignals(self):
-        self.moveFinished.connect(self.on_moveFinished, type=Qt.QueuedConnection)
+        self.cutFinished.connect(self.on_cutFinished, type=Qt.QueuedConnection)
         self.reportCoord.connect(self.on_reportCoord, type=Qt.QueuedConnection)
 
     # worker dispatch
@@ -45,56 +45,21 @@ class CutWidget(QWidget):
         self._worker.runTask(fn=fn, fn_finished=cb,fn_progress=prg, **kwargs)
         self.commStarted.emit()
 
-    def _moveXMinus(self):
+    def _startCut(self):
         self._startWorker(
             fn=self._controller.moveXMinus,
-            cb=self._moveFinishedCallback,
+            cb=self._cutFinishedCallback,
             prg=self._reportCoord,
         )
 
-    def _moveXPlus(self):
-        self._startWorker(
-            fn=self._controller.moveXPlus,
-            cb=self._moveFinishedCallback,
-            prg=self._reportCoord,
-        )
-
-    def _moveYMinus(self):
-        self._startWorker(
-            fn=self._controller.moveYMinus,
-            cb=self._moveFinishedCallback,
-            prg=self._reportCoord,
-        )
-
-    def _moveYPlus(self):
-        self._startWorker(
-            fn=self._controller.moveYPlus,
-            cb=self._moveFinishedCallback,
-            prg=self._reportCoord,
-        )
-
-    def _moveZMinus(self):
-        self._startWorker(
-            fn=self._controller.moveZMinus,
-            cb=self._moveFinishedCallback,
-            prg=self._reportCoord,
-        )
-
-    def _moveZPlus(self):
-        self._startWorker(
-            fn=self._controller.moveZPlus,
-            cb=self._moveFinishedCallback,
-            prg=self._reportCoord,
-        )
-
-    def _moveFinishedCallback(self, result: tuple):
-        self.moveFinished.emit(TaskResult(*result))
+    def _cutFinishedCallback(self, result: tuple):
+        self.cutFinished.emit(TaskResult(*result))
 
     def _reportCoord(self, data):
         self.reportCoord.emit(data)
 
     @pyqtSlot(TaskResult)
-    def on_moveFinished(self, result):
+    def on_cutFinished(self, result):
         ok, _ = result.values
         if not ok:
             print('error during move command, check logs')
@@ -109,34 +74,5 @@ class CutWidget(QWidget):
         self._ui.peditStatus.setPlainText(self._controller.instrumentState)
 
     @pyqtSlot()
-    def on_btnXMinus_clicked(self):
-        self._moveXMinus()
-
-    @pyqtSlot()
-    def on_btnXPlus_clicked(self):
-        self._moveXPlus()
-
-    @pyqtSlot()
-    def on_btnYMinus_clicked(self):
-        self._moveYMinus()
-
-    @pyqtSlot()
-    def on_btnYPlus_clicked(self):
-        self._moveYPlus()
-
-    @pyqtSlot()
-    def on_btnZMinus_clicked(self):
-        self._moveZMinus()
-
-    @pyqtSlot()
-    def on_btnZPlus_clicked(self):
-        self._moveZPlus()
-
-    @pyqtSlot(int)
-    def on_spinPlane_valueChanged(self, value):
-        self._controller.deltaX = value
-        self._controller.deltaY = value
-
-    @pyqtSlot(int)
-    def on_spinZ_valueChanged(self, value):
-        self._controller.deltaZ = value
+    def on_btnStart_clicked(self):
+        self._startCut()
