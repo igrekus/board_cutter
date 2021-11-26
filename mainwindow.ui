@@ -14,7 +14,7 @@
    <string>Резка плат</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
      <number>5</number>
     </property>
@@ -31,54 +31,50 @@
      <number>8</number>
     </property>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,2">
-      <item>
-       <widget class="QGroupBox" name="grpConnect">
-        <property name="title">
-         <string>Станок</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
+     <widget class="QGroupBox" name="grpConnect">
+      <property name="title">
+       <string>Станок</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,2">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
-           <item>
-            <widget class="QPushButton" name="btnConnect">
-             <property name="minimumSize">
-              <size>
-               <width>90</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Подключить</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="editAddress">
-             <property name="placeholderText">
-              <string>адрес...</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QPushButton" name="btnConnect">
+           <property name="minimumSize">
+            <size>
+             <width>90</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Подключить</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="editAddress">
+           <property name="placeholderText">
+            <string>адрес...</string>
+           </property>
+          </widget>
          </item>
         </layout>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>556</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </item>
     <item>
      <widget class="QTabWidget" name="tabMain">
