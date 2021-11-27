@@ -115,9 +115,11 @@ class GrblMachine:
 
     def set_distance_mode(self, mode='incremental'):
         print(f'set distance mode {mode}')
-        if mode != 'incremental':
-            raise NotImplementedError(f'GRBL: {mode} not implemented')
-        return ('ok' in self.send(str(pg.GCodeIncrementalDistanceMode()))), ''
+        if mode == 'incremental':
+            return ('ok' in self.send(str(pg.GCodeIncrementalDistanceMode()))), ''
+        elif mode == 'absolute':
+            return ('ok' in self.send(str(pg.GCodeAbsoluteDistanceMode()))), ''
+        raise NotImplementedError(f'GRBL: {mode} not implemented')
 
     # TODO add generic move method with coord params
     def move_x(self, delta, feed_rate=150):
