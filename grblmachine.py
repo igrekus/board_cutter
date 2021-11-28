@@ -108,6 +108,10 @@ class GrblMachine:
         print('selecting coordinate system 1...')
         return ('ok' in self.send(str(pg.GCodeSelectCoordinateSystem1()))), ''
 
+    def select_coord_sys_2(self):
+        print('selecting coordinate system 2...')
+        return ('ok' in self.send(str(pg.GCodeSelectCoordinateSystem2()))), ''
+
     def set_unit(self, unit='mm'):
         print(f'set unit to {unit}...')
         gcode = pg.GCodeUseMillimeters if unit == 'mm' else pg.GCodeUseInches
