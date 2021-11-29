@@ -104,6 +104,7 @@ class GrblMachine:
         print('select XY plane...')
         return ('ok' in self.send(str(pg.GCodeSelectXYPlane()))), ''
 
+    # TODO refactor, use system select helper method
     def select_coord_sys_1(self):
         print('selecting coordinate system 1...')
         return ('ok' in self.send(str(pg.GCodeSelectCoordinateSystem1()))), ''
