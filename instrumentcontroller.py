@@ -14,6 +14,7 @@ mock = True
 class InstrumentController(QObject):
     mill_len_mm = 6
     mill_diam_mm = 3.175
+    mill_height_delta = 7
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -301,6 +302,56 @@ class InstrumentController(QObject):
         print('executing cut program...')
         print(f'cuts: {cuts}')
         print(f'token: {token}')
+
+        segm = ((0, 0),  # start points of segments
+                (-2.285, 0.225))
+        segment = 4170  # lenght of 1 cutting segment
+        step = 100  # milling step in um
+        n_of_cuts = segment // step
+        depth = 9230 - 7000  # depth of PCB in um
+        depth_mill = 200  # depth of milling in um
+
+        self._machine.stop_spindle()
+        self._machine.set_distance_mode('absolute')
+        self._machine.select_coord_sys_2()
+
+        self._machine.move_xy(x=segm[1][0], y=segm[1][1], feed_rate=150)  # go to start of segment (?) TODO use tool length offset command
+        self._waitHelper(report_fn)
+
+        self._machine.set_distance_mode('incremental')
+
+        self._machine.move_z(delta=-self.mill_height_delta, feed_rate=150)  # lower to milling position
+        self._waitHelper(report_fn)
+
+        self._machine.start_spindle_cw(speed=300)
+
+        def cut_south():
+            # TODO wat
+            z_value = round((depth + depth_mill) / 1000, 3)
+            y_value = round(step / 1000, 3)
+
+            self._machine.move_z(delta=-z_value, feed_rate=15)
+            self._machine.move_y(delta=-y_value, feed_rate=10)
+            self._machine.move_z(delta=z_value, feed_rate=150)
+
+        def return_to_null():
+            print('Returning to null')
+            self._machine.set_distance_mode('absolute')
+            self._machine.select_coord_sys_1()
+            self._machine.move(0, 0, 0, feed_rate=150)
+            self._waitHelper(report_fn)
+
+        for i in list(range(n_of_cuts))[:2]:
+            self._machine.flush_input()
+            cut_south()
+            self._waitHelper(report_fn)
+            print(f"step {i + 1} done")
+
+        self._machine.set_distance_mode('incremental')
+        self._machine.move_z(delta=self.mill_height_delta, feed_rate=150)  # raise from milling position
+        self._machine.stop_spindle()
+
+        return_to_null()
 
         self._waitHelper(report_fn)
         ok, msg = True, 'ok'
