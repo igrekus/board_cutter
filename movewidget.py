@@ -143,4 +143,4 @@ class MoveWidget(QWidget):
 
     @pyqtSlot(int)
     def on_spinFeedRate_valueChanged(self, value):
-        self._controller.feedRate = value
+        self._controller.feed_rate = value

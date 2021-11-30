@@ -68,3 +68,11 @@ class RealtimeStatus:
     @property
     def state(self):
         return self._state['state']
+
+    @property
+    def feed_rate(self):
+        return self._state['feed']
+
+    @property
+    def speed(self):
+        return self._state['speed']

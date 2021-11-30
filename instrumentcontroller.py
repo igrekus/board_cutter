@@ -27,7 +27,7 @@ class InstrumentController(QObject):
         self._deltaY = 10.0
         self._deltaZ = 10.0
 
-        self.feedRate = 150
+        self.feed_rate = 150
 
         self.probe_x = 0.0
         self.probe_y = 0.0
@@ -83,22 +83,22 @@ class InstrumentController(QObject):
         return ok, msg
 
     def moveXMinus(self, token, **kwargs):
-        return self.moveCommand(axis='x', delta=-self.deltaX, feed_rate=self.feedRate, token=token, **kwargs)
+        return self.moveCommand(axis='x', delta=-self.deltaX, feed_rate=self.feed_rate, token=token, **kwargs)
 
     def moveXPlus(self, token, **kwargs):
-        return self.moveCommand(axis='x', delta=self.deltaX, feed_rate=self.feedRate, token=token, **kwargs)
+        return self.moveCommand(axis='x', delta=self.deltaX, feed_rate=self.feed_rate, token=token, **kwargs)
 
     def moveYMinus(self, token, **kwargs):
-        return self.moveCommand(axis='y', delta=-self.deltaY, feed_rate=self.feedRate, token=token, **kwargs)
+        return self.moveCommand(axis='y', delta=-self.deltaY, feed_rate=self.feed_rate, token=token, **kwargs)
 
     def moveYPlus(self, token, **kwargs):
-        return self.moveCommand(axis='y', delta=self.deltaY, feed_rate=self.feedRate, token=token, **kwargs)
+        return self.moveCommand(axis='y', delta=self.deltaY, feed_rate=self.feed_rate, token=token, **kwargs)
 
     def moveZMinus(self, token, **kwargs):
-        return self.moveCommand(axis='z', delta=-self.deltaZ, feed_rate=self.feedRate, token=token, **kwargs)
+        return self.moveCommand(axis='z', delta=-self.deltaZ, feed_rate=self.feed_rate, token=token, **kwargs)
 
     def moveZPlus(self, token, **kwargs):
-        return self.moveCommand(axis='z', delta=self.deltaZ, feed_rate=self.feedRate, token=token, **kwargs)
+        return self.moveCommand(axis='z', delta=self.deltaZ, feed_rate=self.feed_rate, token=token, **kwargs)
 
     def askG(self, token, **kwargs):
         return self._machine.query_g()
@@ -124,6 +124,7 @@ class InstrumentController(QObject):
             self.probe_x = self._rt_state.probe['x']
             self.probe_y = self._rt_state.probe['y']
             self.probe_z = self._rt_state.probe['z']
+            self.feed_rate = self._rt_state.feed_rate
             self.state = self._rt_state.state
 
     def _queryCalibrationsState(self):
@@ -394,7 +395,7 @@ class InstrumentController(QObject):
         Z={self.probe_z}
         
         Feed rate:
-        FR={self.feedRate}
+        FR={self.feed_rate}
         
         Калибровка:
         X: {self.is_calibrated_x}
