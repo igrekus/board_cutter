@@ -25,6 +25,7 @@ class Task(QRunnable):
             if self.fn_failed:
                 self.fn_failed(ex)
             result = result, 'unknown error'
+            print('Exception:', ex)
         if self.fn_finished:
             self.fn_finished(result)
 
