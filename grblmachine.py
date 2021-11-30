@@ -143,6 +143,11 @@ class GrblMachine:
         command = f'{pg.GCodeLinearMove(Z=delta)} {pg.GCodeFeedRate(feed_rate)}'
         return ('ok' in self.send(command)), ''
 
+    def move_xy(self, x, y, feed_rate=150):
+        print('move XY...')
+        command = f'{pg.GCodeLinearMove(X=x, Y=y)} {pg.GCodeFeedRate(feed_rate)}'
+        return ('ok' in self.send(command)), ''
+
     def move(self, x, y, z, feed_rate=150):
         print('free move...')
         command = f'{pg.GCodeLinearMove(X=x, Y=y, Z=z)} {pg.GCodeFeedRate(feed_rate)}'
