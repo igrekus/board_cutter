@@ -126,6 +126,11 @@ class GrblMachine:
             return ('ok' in self.send(str(pg.GCodeAbsoluteDistanceMode()))), ''
         raise NotImplementedError(f'GRBL: {mode} not implemented')
 
+    def start_spindle_cw(self, speed=300):
+        print(f'start spindle cw, speed={speed}')
+        command = f'{pg.GCodeStartSpindleCW()} {pg.GCodeSpindleSpeed(300)}'
+        return ('ok' in self.send(command)), ''
+
     # TODO add generic move method with coord params
     def move_x(self, delta, feed_rate=150):
         print('move X...')
