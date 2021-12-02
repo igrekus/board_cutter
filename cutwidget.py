@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
 
 from backgroundworker import BackgroundWorker, CancelToken, TaskResult
+from cutmodel import CutModel
 from instrumentcontroller import InstrumentController
 
 
@@ -28,6 +29,7 @@ class CutWidget(QWidget):
         self._token = CancelToken()
 
         self._controller = controller
+        self._model = CutModel(parent=self)
 
         self._connectSignals()
 
@@ -35,6 +37,14 @@ class CutWidget(QWidget):
 
     def _init(self):
         self._ui.peditStatus.setPlainText(self._controller.instrumentState)
+        self._ui.tableCuts.setModel(self._model)
+
+        self._model.update([
+            [1.1, 1.1, 1.2, 1.2],
+            [2.1, 2.1, 2.2, 2.2],
+            [3.1, 3.1, 3.2, 3.2],
+            [4.1, 4.1, 4.2, 4.2],
+        ])
 
     def _connectSignals(self):
         self.cutFinished.connect(self.on_cutFinished, type=Qt.QueuedConnection)
