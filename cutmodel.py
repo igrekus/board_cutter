@@ -28,6 +28,18 @@ class CutModel(QAbstractTableModel):
     def columnCount(self, parent=None, *args, **kwargs):
         return len(self._header)
 
+    def setData(self, index, value, role):
+        if role == Qt.EditRole:
+            row = index.row()
+            col = index.column()
+            try:
+                value = float(str(value).replace(',', '.'))
+                self._data[row][col] = value
+                return True
+            except ValueError:
+                return False
+        return False
+
     def data(self, index, role=None):
         if not index.isValid():
             return QVariant()
